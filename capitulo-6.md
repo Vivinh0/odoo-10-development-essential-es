@@ -9,32 +9,28 @@ Cada componente de la interfaz de usuario se almacena en un registro de base de 
 
 Esto significa que un nuevo archivo de datos XML para nuestra interfaz de usuario debe agregarse al módulo `todo_ui`. Podemos comenzar editando el archivo `__manifest__.py` para declarar estos nuevos archivos de datos:
 
-```
-{ 
-  'name': 'User interface improvements to the To-Do app', 
-  'description': 'User friendly features.', 
-  'author': 'Daniel Reis', 
-  'depends': ['todo_user'], 
-  
-'data': [ 
-    'security/ir.model.access.csv', 
-    'views/todo_view.xml', 
-    'views/todo_menu.xml', 
-  ]
+```py
+ {
+    'name': 'User interface improvements to the To-Do app',
+    'description': 'User friendly features.',
+    'author': 'Daniel Reis',
+    'depends': ['todo_user'],
 
-
-
-} 
+    'data': [
+        'security/ir.model.access.csv',
+        'views/todo_view.xml',
+        'views/todo_menu.xml',
+    ]
+}
 ```
 
 #### Nota
 
 Recuerda que los archivos de datos se cargan en el orden especificado. Esto es importante porque sólo puede referenciar IDs XML que se definieron antes de que ser utilizadas.
 
-
 También podemos crear el subdirectorio y los archivos `views/todo_view.xml` y `views/todo_menu.xml` con una estructura mínima:
 
-```
+```xml
 <?xml version="1.0"?> 
 <odoo> 
   <!-- Content will go here... --> 
@@ -51,7 +47,7 @@ El complemento `todo_app` creó un menú de nivel superior para abrir las tareas
 
 Para ello, agregaremos un nuevo menú de nivel superior para la aplicación y modificaremos la opción de menú de tareas pendientes existente. Para `views / todo_menu.xml`, añada:
 
-```
+```xml
 <!-- Menu items -->
 <!-- Modify top menu item -->
 <menuitem id="todo_app.menu_todo_task" name="To-Do" />
@@ -72,6 +68,7 @@ Para ello, agregaremos un nuevo menú de nivel superior para la aplicación y mo
   sequence="10"
   action="action_todo_stage" />
 ```
+
 En lugar de usar elementos `<record model = "ir.ui.menu">`, podemos usar el elemento de acceso directo más conveniente `<menuitem>`, que proporciona una forma abreviada de definir el registro que se va a cargar.
 
 Nuestro primer elemento de menú es para la entrada del menú superior de la aplicación de tareas pendientes, con sólo el atributo `name` y se usará como padre para las dos opciones siguientes.
@@ -94,7 +91,7 @@ Una **acción de ventana** da instrucciones al cliente de GUI, y usualmente se u
 
 Agregaremos acciones de ventana al archivo de datos `views/todo_menu.xml`, que será utilizado por los elementos de menú creados en la sección anterior. Edita el archivo y asegúrate de que se agreguen antes de los elementos del menú:
 
-```
+```xml
 <!-- Actions for the menu items --> 
 <act_window id="action_todo_stage" 
   name="To-Do Task Stages" 
@@ -119,7 +116,6 @@ Agregaremos acciones de ventana al archivo de datos `views/todo_menu.xml`, que s
   src_model="todo.task"  
   multi="False" 
 /> 
-
 ```
 
 Las acciones de la ventana se almacenan en el modelo `ir.actions.act_window` y se pueden definir en archivos XML utilizando el método abreviado `<act_window>` utilizado en el código anterior.
@@ -136,7 +132,8 @@ La primera acción abrirá el modelo Etapas de tareas e incluirá los atributos 
 
 La segunda acción definida en el XML reemplaza la acción original de Tareas pendientes del complemento `todo_app` para que muestre los otros tipos de vistas que exploraremos más adelante en este capítulo: calendario y gráfico. Una vez instalados estos cambios, verás botones adicionales en la esquina superior derecha, después de los botones de lista y forma; Sin embargo, no funcionarán hasta que creemos las vistas correspondientes.
 
-También añadimos una tercera acción, no utilizada en ninguno de los elementos del menú. Nos muestra cómo agregar una opción al menú **More**s, disponible en la parte superior derecha de la lista y vistas de formulario. Para ello, utiliza dos atributos específicos:
+También añadimos una tercera acción, no utilizada en ninguno de los elementos del menú. Nos muestra cómo agregar una opción al menú **More**, disponible en la parte superior derecha de la lista y vistas de formulario. Para ello, utiliza dos atributos específicos:
+
 + `src_model` indica en qué modelo esta acción debe estar disponible.
 + `multi`, cuando se establece en `True`, lo hace disponible en la vista de lista para que pueda aplicarse a una selección múltiple de registros. El valor predeterminado es `False`, como en nuestro ejemplo, hará que la opción sólo esté disponible en la vista de formulario, por lo que sólo puede aplicarse a un registro a la vez.
 
@@ -149,13 +146,15 @@ Nos hemos topado con contexto y dominio varias veces. Hemos visto que las accion
 El **contexto** es un diccionario que lleva datos de sesión que se pueden utilizar tanto del lado del cliente en la interfaz de usuario como del lado del servidor de la ORM y la lógica de negocio.
 
 En el lado del cliente puede transportar información de una vista a la siguiente, como la ID del registro activo en la vista anterior, después de seguir un enlace o un botón o proporcionar valores predeterminados para ser utilizados en la vista siguiente.
-You can see the lang key with the user language, tz with the time zone information, and uid with the current user ID.
 
-When opening a form from a link or a button in a previous view, an active_id key is added to the context, with the ID of record we were positioned at, in the origin form. In the particular case of list views, we have an active_ids context key containing a list of the record IDs selected in the previous list.
+Puedes ver la tecla lang con el idioma del usuario, tz con la información de la zona horaria, y uid con el ID del usuario actual.
 
-On the client side, the context can be used to set default values or activate default filters on the target view, using keys with the default_ or default_search_ prefixes. Here are some examples:
+Al abrir un formulario desde un enlace o un botón en una vista anterior, se añade una clave active_id al contexto, con el ID de registro en el que estábamos posicionados, en el formulario de origen. En el caso particular de las vistas de lista, tenemos una clave de contexto active_ids que contiene una lista de los ID de registro seleccionados en la lista anterior.
 
-To set the current user as a default value of the user_id field, we will use the following:
+En el lado del cliente, el contexto puede utilizarse para establecer valores predeterminados o activar filtros predeterminados en la vista de destino, utilizando claves con los prefijos default_ o default_search_. A continuación se presentan algunos ejemplos:
+
+Para establecer el usuario actual como valor por defecto del campo user_id, utilizaremos lo siguiente:
+
 En el lado del servidor, algunos valores de campo del conjunto de registros pueden depender de la configuración local proporcionada por el contexto. En particular, la clave `lang` afecta al valor de los campos traducibles. El contexto también puede proporcionar señales para el código del lado del servidor. Por ejemplo, la clave `active_test` cuando se establece en `False` cambia el comportamiento del método de ORM `search ()` para que no filtre los registros inactivos.
 
 Un contexto inicial del cliente web se ve así:
@@ -173,24 +172,11 @@ En el lado del cliente, el contexto se puede utilizar para establecer valores pr
 
 Para configurar el usuario actual como un valor predeterminado del campo `user_id`, utilizaremos lo siguiente:
 
-```
-{'
-default
+`{'default_user_id': uid}`
 
+Para tener un filtro filter_my_tasks activado por defecto en la vista del objetivo, usaremos esto:
 
-
-_user_id': uid} 
-
-To have a filter_my_tasks filter activated by default on the target view, we will use this:
-
-{'
-default_search
-
-
-
-_filter_my_tasks': 1} 
-
-```
+`{'default_search_filter_my_tasks': 1}`
 
 ### Expresiones de dominio
 
@@ -239,7 +225,7 @@ El primer operador '|' (OR) actúa sobre la condición del seguidor más el resu
 
 El siguiente diagrama ilustra esta resolución de los operadores anidados:
 
-![nestedoperationsresolutions](file:img/6-01.jpg)
+![nestedoperationsresolutions](./img/6-01.jpg)
 
 ## Las vistas de formulario
 
@@ -263,61 +249,31 @@ Las aplicaciones empresariales son a menudo sistemas de registro - para producto
 
 Para agregar una vista XML con el esqueleto básico de una vista de documento de negocios, debemos editar el archivo `views/ todo_views.xml` y añadirlo a la parte superior:
 
-```
-<record id="view_form_todo_task_ui" 
-  model="ir.ui.view"> 
-  <field name="model">todo.task</field> 
-  <field name="priority">15</field> 
-  <field name="arch" type="xml"> 
-    <form> 
-
-      <header> 
-
-
-
- 
-        <!-- To add buttons and status widget --> 
-
-      </header>
-
-
-
-
-
-      <sheet>
-
-
-
- 
-        <!-- To add form content -->  
-
-      </sheet>
-
-
-
- 
-      <!-- Discuss widgets for history and 
-      communication: --> 
-
-      <div class="oe_chatter">
-
-
-
-  
-        <field name="message_follower_ids"  
-          widget="mail_followers" /> 
-        <field name="message_ids" widget="mail_thread" /> 
-      
-</div>
-
-
-
- 
-    </form>
-  </field> 
+```xml
+<record id="view_form_todo_task_ui"
+        model="ir.ui.view">
+    <field name="model">todo.task</field>
+    <field name="priority">15</field>
+    <field name="arch" type="xml">
+        <form>
+            <header>
+                <!-- To add buttons and status widget -->
+            </header>
+            <sheet>
+                <!-- To add form content -->
+            </sheet>
+            <!-- Discuss widgets for history and 
+            communication: -->
+            <div class="oe_chatter">
+                <field name="message_follower_ids"
+                       widget="mail_followers"/>
+                <field name="message_ids" widget="mail_thread"/>
+            </div>
+        </form>
+    </field>
 </record> 
-
 ```
+
 El nombre de la vista es opcional y generado automáticamente si falta. Para simplificar, aprovechamos esto y omitimos el elemento `<field name="name">` del registro de vista.
 
 Podemos ver que las vistas de documentos empresariales suelen utilizar tres áreas principales: la barra de estado del encabezado **header**, la hoja **sheet** del contenido principal y una sección inferior **history and communication** de historial y comunicación, también conocida como **chatter** o charla.
@@ -342,7 +298,7 @@ Todavía es posible beneficiarse de lo mejor de ambos mundos, mapeando las etapa
 
 En el archivo `views/todo_view.xml` ahora podemos expandir el encabezado básico para agregar una barra de estado:
 
-```
+```xml
 <header>  
   <field name="state" invisible="True" />
   <button name="do_toggle_done" type="object" 
@@ -366,7 +322,7 @@ A continuación, se agrega un botón a la barra de estado, para permitir al usua
 
 Los botones que aparecen en la barra de estado deben cambiarse en función del lugar del ciclo de vida del documento actual.
 
- Utilizamos el atributo `attrs` para ocultar el botón cuando el documento está en estado `draft`. La condición para hacer esto utiliza el campo `state`, no mostrado en el formulario, por lo que tuvimos que añadirlo como un campo oculto.
+Utilizamos el atributo `attrs` para ocultar el botón cuando el documento está en estado `draft`. La condición para hacer esto utiliza el campo `state`, no mostrado en el formulario, por lo que tuvimos que añadirlo como un campo oculto.
 
 Si tenemos un campo de selección `state`, podemos usar el atributo `states`. En este caso lo hacemos, y el mismo efecto podría lograrse usando `states="open, done"`. Aunque no es tan flexible como el atributo `attrs`, es más conciso.
 
@@ -378,7 +334,7 @@ Cuando se utiliza un widget de barra de estado con etapas, podemos tener ocultas
 
 Cuando se utiliza el widget de barra de estado con un campo de estado, se puede lograr un efecto similar con el atributo `statusbar_visible`, utilizado para enumerar estados que deben estar siempre visibles y ocultar estados de excepción necesarios para casos menos comunes. Por ejemplo:
 
-```
+```xml
 <field name="stage_id" widget="statusbar"
   clickable="True"
   statusbar_visible="draft,open" />
@@ -405,13 +361,13 @@ El HTML regular, incluyendo elementos del estilo CSS, también se puede utilizar
 
 Aquí está el elemento `<sheet>` expandido para incluir el título además de algunos campos adicionales como subtítulos:
 
-```
+```xml
 <sheet> 
   <div class="oe_title"> 
     <label for="name" class="oe_edit_only"/> 
     <h1><field name="name"/></h1> 
     <h3> 
-      <span class="oe_read_only>By</span> 
+      <span class="oe_read_only">By</span> 
       <label for="user_id" class="oe_edit_only"/> 
       <field name="user_id" class="oe_inline" /> 
     </h3> 
@@ -423,7 +379,7 @@ Aquí podemos ver que usamos elementos HTML normales, como `div`, `span`, `h1` y
 
 En algunos casos, como Socios o Productos, se muestra una imagen representativa en la esquina superior izquierda. Suponiendo que teníamos un campo binario `my_image`, podríamos añadir antes de la línea `<div class="oe_title">`, usando:
 
-```
+```xml
 <field name="my_image" widget="image" class="oe_avatar"/>
 ```
 
@@ -432,7 +388,8 @@ En algunos casos, como Socios o Productos, se muestra una imagen representativa 
 El área superior derecha puede tener una caja invisible donde se pueden colocar los botones. La versión 8.0 introdujo botones inteligentes, mostrados como rectángulos con un indicador estadístico que se puede seguir cuando se hace clic.
 
 Podemos agregar la caja de botones justo después del final del DIV `oe_title`, con lo siguiente:
-```
+
+```xml
 <div name="buttons" class="oe_right oe_button_box">
   <!-- Smart buttons here … -->
 </div>
@@ -448,40 +405,19 @@ Un valor de campo y una etiqueta de campo toman dos columnas, por lo que agregar
 
 Continuando con nuestra vista de formulario, ahora podemos agregar el contenido principal después del cuadro de botones inteligentes:
 
-```
-
-<group name="group_top"> 
-  <group name="group_left">
-
-
-
- 
-    <field name="date_deadline" /> 
-    
-<separator string="Reference" />
-
-
-
- 
-    <field name="refers_to" /> 
-  
-</group> 
-  <group name="group_right">
-
-
-
- 
-    <field name="tag_ids" widget="many2many_tags"/> 
-  
-</group> 
-
-
-
-
-
+```xml
+<group name="group_top">
+    <group name="group_left">
+        <field name="date_deadline"/>
+        <separator string="Reference"/>
+        <field name="refers_to"/>
+    </group>
+    <group name="group_right">
+        <field name="tag_ids" widget="many2many_tags"/>
+    </group>
 </group>
-
 ```
+
 Es una buena práctica asignar un nombre o `name` a las etiquetas de grupo para que sea más fácil hacer referencia a ellas más tarde para ampliar la vista (ya sea para tí u otro desarrollador). El atributo `string`también está permitido, y si se establece, se utiliza para mostrar el título de la sección.
 
 Dentro de un grupo, un elemento `<newline>` forzará una nueva línea y el siguiente elemento se renderizará en la primera columna del grupo. Se pueden añadir títulos de sección adicionales dentro de un grupo utilizando el elemento `<separator>`.
@@ -502,7 +438,7 @@ Otra forma de organizar el contenido es utilizar el elemento `notebook`, que con
 
 No necesitaremos agregar esto a nuestro formulario Tarea pendiente, pero aquí hay un ejemplo que podría agregarse a un formulario de Etapas de tareas:
 
-```
+```xml
 <notebook> 
   <page string="Whiteboard" name="whiteboard"> 
     <field name="docs" /> 
@@ -544,17 +480,21 @@ Los atributos específicos de algunos tipos de campos son:
 #### Etiquetas para campos
 
 El elemento `<label>` se puede utilizar para controlar mejor la presentación de una etiqueta de campo. Un caso en el que se utiliza es presentar la etiqueta sólo cuando el formulario está en modo de edición:
-```
+
+```xml
 <Label for="name" class="oe_edit_only" />
 ```
+
 Al hacer esto, si el campo está dentro de un elemento `<group>`, por lo general queremos también establecer `nolabel="True"` en él.
 
 #### Campos relacionales
 
 En los campos relacionales, podemos tener algún control adicional sobre lo que el usuario puede hacer. De forma predeterminada, el usuario puede crear nuevos registros desde estos campos (también conocido como "creación rápida") y abrir el formulario de registro relacionado. Esto se puede desactivar usando el atributo de campo de `options`:
-```
+
+```py
 Options={'no_open': True, 'no_create': True}
 ```
+
 El contexto y el dominio también son particularmente útiles en los campos relacionales. El contexto puede definir los valores predeterminados para los registros relacionados y el dominio puede limitar los registros seleccionables. Un ejemplo común es top, tiene la lista de registros seleccionable en un campo para depender del valor actual para otro campo del registro actual. El dominio se puede definir en el modelo, pero también se puede sobreescribir en la vista.
 
 #### Widgets de campo
@@ -606,7 +546,7 @@ Para nuestra aplicación, tendremos un botón que muestra el número total de ta
 
 Primero debemos añadir el correspondiente campo computado a `models/todo_model.py`. Agregue a la clase `TodoTask` con lo siguiente:
 
-```
+```py
 def compute_user_todo_count(self):
     for task in self:
         task.user_todo_count = task.search_count(
@@ -615,11 +555,11 @@ def compute_user_todo_count(self):
 user_todo_count = fields.Integer(
     'User To-Do Count',
     compute='compute_user_todo_count')
-
 ```
+
 A continuación, agregamos la caja del botón y el botón dentro de ella. Justo después de terminar el DIV `oe_title`, reemplaza el marcador de posición de cuadro de botones que agregamos antes, con lo siguiente:
 
-```
+```xml
 <div name="buttons" class="oe_right oe_button_box">
   <button class="oe_stat_button"
     type="action" icon="fa-tasks"
@@ -645,7 +585,7 @@ Estos son los atributos que podemos usar al agregar botones inteligentes:
 
 El elemento `button` en sí es un contenedor, con campos que muestran estadísticas. Estos son campos regulares que utilizan el widget `statinfo`. El campo debe ser un campo computado definido en el modelo subyacente. Aparte de campos, dentro de un botón también podemos usar texto estático, como:
 
-```
+```html
 <div>User's To-dos</div>
 ```
 
@@ -653,7 +593,7 @@ Al hacer clic en el botón, queremos ver una lista con sólo las Tareas para el 
 
 La Acción utilizada debe definirse antes del Formulario, por lo que debemos añadirla en la parte superior del archivo XML:
 
-```
+```xml
 <act_window id="action_todo_task_button"
   name="To-Do Tasks"
   res_model="todo.task"
@@ -664,6 +604,7 @@ La Acción utilizada debe definirse antes del Formulario, por lo que debemos añ
 Observe cómo usamos la clave de contexto default_user_id para el filtro de dominio. Esta clave en particular también establecerá el valor predeterminado en el campo user_id al crear nuevas Tareas después de seguir el enlace del botón.
 
 ## Vistas dinámicas
+
 Los elementos de vista también admiten algunos atributos dinámicos que permiten a las vistas cambiar dinámicamente su apariencia o comportamiento dependiendo de los valores del campo. Podemos tener en eventos de cambio, la capacidad de cambiar valores en otros campos mientras edita datos en un formulario, o tener campos obligatorios o visibles sólo cuando se cumplen ciertas condiciones.
 
 ### En los eventos de cambio
@@ -683,7 +624,7 @@ Aparte de estos, también tenemos un método flexible disponible para establecer
 
 Por ejemplo, para que el campo `refers_to` sea visible en todos los estados, excepto el borrador, utilice el código siguiente:
 
-```
+```xml
 <field name="refers_to" attrs="{'invisible':   
   state=='draft'}" /> 
 ```
@@ -696,7 +637,7 @@ Los `attrs` también pueden establecer valores para otros dos atributos: `readon
 
 En este punto, las vistas de lista deben necesitar poca introducción, pero todavía vamos a discutir los atributos que se pueden utilizar con ellos. A continuación se muestra un ejemplo de una vista de lista para nuestras Tareas pendientes:
 
-```
+```xml
 <record id="todo_app.view_tree_todo_task" 
   model="ir.ui.view"> 
   <field name="model">todo.task</field> 
@@ -731,17 +672,17 @@ Una vista de lista puede contener campos y botones, y la mayoría de sus atribut
 
 En las vistas de lista, los campos numéricos pueden mostrar valores de resumen para su columna. Para ello, agregue al campo uno de los atributos de agregación disponibles, `sum`, `avg`, `min` o `max` y asigne el texto de etiqueta para el valor de resumen. Por ejemplo:
 
-```
+```xml
 <field name="amount" sum="Total Amount" />
 ```
 
 ## Vistas de Búsqueda
 
-Las opciones de búsqueda disponibles se definen mediante el tipo de vista `<búsqueda>` . Podemos elegir los campos se pueden buscar automáticamente al escribir en el cuadro de búsqueda. También podemos proporcionar filtros predefinidos, activados con un clic y opciones de agrupación predefinidas que se utilizarán en vistas de lista.
+Las opciones de búsqueda disponibles se definen mediante el tipo de vista `<búsqueda>`. Podemos elegir los campos se pueden buscar automáticamente al escribir en el cuadro de búsqueda. También podemos proporcionar filtros predefinidos, activados con un clic y opciones de agrupación predefinidas que se utilizarán en vistas de lista.
 
 Esta es una posible vista de búsqueda para las Tareas pendientes:
 
-```
+```xml
 <record id="todo_app.view_filter_todo_task" 
   model="ir.ui.view"> 
   <field name="model">todo.task</field> 
@@ -760,6 +701,7 @@ Esta es una posible vista de búsqueda para las Tareas pendientes:
   </field> 
 </record>
 ```
+
 Podemos ver dos campos a buscar: `–name` y `user_id`. Cuando el usuario comience a escribir en el cuadro de búsqueda, un menú desplegable le sugerirá buscar en cualquiera de estos campos. Si el usuario escribe `ENTER`, la búsqueda se realizará en el primero de los campos de filtro.
 
 Entonces tenemos dos filtros predefinidos, filtrando tareas hechas y no hechas. Estos filtros se pueden activar independientemente, y se unirán con un operador OR. Los bloques de filtros separados con un elemento `<separator/>` se unirán con un operador AND.
@@ -786,7 +728,7 @@ Para los elementos de filtro, estos son los atributos disponibles:
 
 Como su nombre indica, este tipo de vista presenta los registros de un calendario que se pueden ver durante mes, semana o días. Una vista de calendario para las Tareas pendientes podría tener este aspecto:
 
-```
+```xml
 <record id="view_calendar_todo_task" model="ir.ui.view"> 
   <field name="model">todo.task</field> 
   <field name="arch" type="xml"> 
@@ -798,7 +740,6 @@ Como su nombre indica, este tipo de vista presenta los registros de un calendari
     </calendar> 
   </field> 
 </record> 
-
 ```
 
 Los atributos del calendario son:
@@ -825,7 +766,7 @@ También debe añadirse al formulario Tarea pendiente, de modo que podamos añad
 
 Ahora vamos a añadir la vista gráfica de las Tareas pendientes:
 
-```
+```xml
 <record id="view_graph_todo_task" model="ir.ui.view"> 
   <field name="model">todo.task</field> 
     <field name="arch" type="xml"> 
@@ -843,7 +784,7 @@ Los datos también se pueden ver en una tabla dinámica, una matriz de análisis
 
 Para agregar también una tabla dinámica a las Tareas pendientes, utilice este código:
 
-```
+```xml
 <record id="view_pivot_todo_task" model="ir.ui.view"> 
   <field name="arch" type="xml"> 
     <pivot> 
@@ -855,6 +796,7 @@ Para agregar también una tabla dinámica a las Tareas pendientes, utilice este 
   </field> 
 </record>
 ```
+
 Las vistas de gráfico y pivote deben contener elementos de campo que describen el eje y las medidas a utilizar. La mayoría de los atributos disponibles son comunes a ambos tipos de vista:
 
 + `name` identifica el campo que se va a utilizar en el gráfico, al igual que en otras vistas
@@ -876,3 +818,5 @@ Por último, las vistas de diagrama se utilizan para casos muy específicos, y u
 ## Resumen
 
 En este capítulo, aprendimos más sobre las vistas de Odoo para construir la interfaz de usuario, cubriendo los tipos de vista más importantes. En el próximo capítulo, aprenderemos más sobre cómo agregar lógica de negocios a nuestras aplicaciones.
+
+---

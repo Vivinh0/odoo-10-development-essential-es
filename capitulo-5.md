@@ -105,7 +105,7 @@ Para completar, hay un par de más atributos que se pueden utilizar en casos ava
 + `_rec_name` indica el campo a utilizar como la descripción del registro cuando se hace referencia desde campos relacionados, tales como una relación de varios a uno. De forma predeterminada, utiliza el campo de `nombre`, que es un campo común en los modelos. Pero este atributo nos permite usar cualquier otro campo para ese propósito.
 + `_table` es el nombre de la tabla de la base de datos que soporta el modelo. Por lo general, se deja que se calcule automáticamente, y es el nombre del modelo con los puntos reemplazados por subrayados. Pero es posible establecer para indicar un nombre de tabla específico.
 
-También podemos tener los atributos `_inherit` y `_inherits`, como se explicó en el capítulo 3, *Herencia - Extendiendo las aplicaciones existentes.
+También podemos tener los atributos `_inherit` y `_inherits`, como se explicó en el capítulo 3, *Herencia - Extendiendo las aplicaciones existentes*.
 
 ### Modelos y clases Python
 
