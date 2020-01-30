@@ -11,7 +11,7 @@ Nuestra aplicación de To-Do ahora permite a los usuarios gestionar de forma pri
 
 Lo haremos con un nuevo módulo para ampliar la aplicación To-Do previamente creada y agregar estas nuevas características utilizando los mecanismos de herencia. Esto es lo que esperamos lograr al final de este capítulo:
 
-![Mytodo](file:img/3-01.jpg)
+![Mytodo](./img/3-01.jpg)
 
 Este será nuestro plan de trabajo para las extensiones de características que se implementarán:
 
@@ -24,13 +24,12 @@ Comenzaremos a crear el esqueleto básico de un nuevo módulo `todo_user` junto 
 
 Ahora crea `todo_user / __ manifest__.py`, que contenga este código:
 
-```
+```py
 {  'name': 'Multiuser To-Do', 
    'description': 'Extend the To-Do app to multiuser.', 
    'author': 'Daniel Reis', 
    'depends': ['todo_app'], }
 ```
-
 
 No lo hemos hecho aquí, pero incluir las claves de `summary` y claves `category` puede ser importante al publicar módulos en la tienda de aplicaciones en línea de Odoo.
 Observa que hemos añadido la dependencia explícita al módulo `todo_app`. Esto es necesario e importante para que el mecanismo de herencia funcione correctamente. Y de ahora en adelante, cuando el módulo `todo_app` se actualice, todos los módulos dependiendo de él, como el módulo `todo_user`, también serán actualizados.
@@ -58,20 +57,21 @@ Vamos a ampliar el modelo `todo.task` para añadir un par de campos a ella: el u
 Las pautas de estilo de codificación recomendaron tener un subdirectorio `models /` con un archivo por modelo Odoo. Así que debemos comenzar creando el subdirectorio modelo, haciéndolo Python-importable.
 
 Edita el archivo `todo_user / __ init__.py` para tener este contenido:
-```
+
+```py
 from .import models
 ```
 
-
 Crea `todo_user / models / __ init__.py` con el siguiente código:
-```
+
+```py
 from . import todo_task
 ```
 
-
 La línea anterior le indica a Python que busque un archivo llamado odoo_task.py en el mismo directorio y lo importe. Por lo general, tendrías una línea `from` para cada archivo Python en el directorio:
 ahora crea el archivo `todo_user/models/todo_task.py` para extender el modelo original:
-```
+
+```py
 # -*- coding: utf-8 -*- 
 from odoo import models, fields, api 
 class TodoTask(models.Model): 
@@ -79,9 +79,11 @@ class TodoTask(models.Model):
     user_id = fields.Many2one('res.users', 'Responsible') 
     date_deadline = fields.Date('Deadline')
 ```
+
 El nombre de clase `TodoTask` es local para este archivo de Python y, en general, es irrelevante para otros módulos. El atributo de clase `_inherit` es la clave aquí: le dice a Odoo que esta clase está heredando y modificando así el modelo `todo.task`.
 
 #### Nota
+
 Observa que el atributo `_name` está ausente. No es necesario porque ya está heredado del modelo padre.
 
 Las dos líneas siguientes son declaraciones de campo regulares. El campo `user_id` representa un usuario del modelo de usuarios `res.users`. Es un campo `Many2one`, que es equivalente a una clave extranjera en la jerga de la base de datos. El `date_deadline` es un simple campo de fecha. En el capítulo 5, *Modelos - Estructurando de los datos de aplicación*, explicaremos los tipos de campos disponibles en Odoo con más detalle.
@@ -94,7 +96,7 @@ Como puedes ver, agregar nuevos campos a un modelo existente es bastante sencill
 
 Por ejemplo, para agregar una herramienta de ayuda al campo de nombre, agregamos esta línea a `todo_ task.py`, descrito anteriormente:
 
-```
+```py
 name = fields.Char(help="What needs to be done?") 
 ```
 
@@ -113,7 +115,8 @@ Es mejor evitar cambiar la firma de la función del método (es decir, mantener 
 La acción original **Clear All Done** no es apropiada para nuestro módulo de intercambio de tareas ya que borra todas las tareas, independientemente de su usuario. Tenemos que modificarlo para que borre sólo las tareas del usuario actual.
 
 Para ello, anularemos (o reemplazaremos) el método original por una nueva versión que primero encuentre la lista de tareas completadas para el usuario actual y luego las inactive:
-```
+
+```py
 @api.multi 
 def do_clear_done(self): 
     domain = [('is_done', '=', True), 
@@ -123,8 +126,6 @@ def do_clear_done(self):
     dones.write({'active': False}) 
     return True 
 ```
-
-
 
 Para mayor claridad, primero construimos la expresión de filtro que se utilizará para encontrar los registros que se van a borrar.
 
@@ -141,7 +142,8 @@ En este caso, hemos sobrescrito completamente el método padre, reemplazándolo 
 Para que el método principal mantenga la lógica ya existente, usamos la construcción `super ()` de Python para llamar a la versión del método padre. Veamos un ejemplo de esto.
 
 Podemos mejorar el método `do_toggle_done ()` para que sólo realice su acción en las tareas asignadas al usuario actual. Este es el código para lograrlo:
-```
+
+```py
 from odoo.exceptions import ValidationError
 # ...
 # class TodoTask(models.Model):
@@ -153,7 +155,6 @@ def do_toggle_done(self):
             raise ValidationError(
                 'Only the responsible can do this!') 
     return super(TodoTask, self).do_toggle_done()
-
 ```
 
 El método en la clase heredada comienza con un bucle `for` para comprobar que ninguna de las tareas a activar pertenece a otro usuario. Si estos chequeos pasan, entonces continúa llamando al método de clase padre, usando `super ()`. Si no se plantea un error, y debemos utilizar para ello las excepciones incorporadas de Odoo. Los más relevantes son `ValidationError`, utilizado aquí y `UserError`.
@@ -161,10 +162,12 @@ El método en la clase heredada comienza con un bucle `for` para comprobar que n
 Estas son las técnicas básicas para reemplazar y extender la lógica empresarial definida en las clases de modelo. A continuación, veremos cómo ampliar las vistas de la interfaz de usuario.
 
 ## Extendiendo vistas
+
 Las formas, listas y vistas de búsqueda se definen utilizando las estructuras de `arch XML`. Para ampliar vistas, necesitamos una forma de modificar este XML. Esto significa localizar elementos XML y luego introducir modificaciones en esos puntos.
 
 Las vistas heredadas permiten justamente eso. Una declaración de vista heredada tiene este aspecto:
-```
+
+```xml
 <record id="view_form_todo_task_inherited"   
   model="ir.ui.view"> 
   <field name="name">Todo Task form - User 
@@ -174,10 +177,10 @@ Las vistas heredadas permiten justamente eso. Una declaración de vista heredada
     ref="todo_app.view_form_todo_task"/> 
   <field name="arch" type="xml"> 
     <!-- ...match and extend elements here! ... --> 
-  </field 
+  </field>
 </record> 
-
 ```
+
 El campo `inherit_id` identifica la vista que debe extenderse consultando su identificador externo usando el atributo especial `ref`. Los identificadores externos se tratarán con más detalle en el Capítulo 4, *Datos del módulo*.
 
 Siendo XML, la mejor manera de localizar elementos en XML es usar expresiones XPath. Por ejemplo, tomando la vista de formulario definida en el capítulo anterior, una expresión XPath para localizar el elemento `<field name = "is_done">` es `// field [@name] = 'is_done'`. Esta expresión encuentra cualquier elemento `field` con un atributo `name` igual a `is_done`. Puedes encontrar más información sobre XPath en https://docs.python.org/2/library/xml.etree.elementtree.html#xpath-support.
@@ -185,17 +188,21 @@ Siendo XML, la mejor manera de localizar elementos en XML es usar expresiones XP
 Si una expresión XPath coincide con varios elementos, sólo se modificará la primera. Por lo tanto, deben ser hechos lo más específico posible, utilizando atributos únicos. El uso del atributo `name` es la forma más fácil de asegurar que encontramos los elementos exactos que queremos utilizar un punto de extensión. Por lo tanto, es importante configurarlos en nuestros elementos de vista XML.
 
 Una vez localizado el punto de extensión, puedes modificarlo o tener elementos XML añadidos cerca de él. Como un ejemplo práctico, para agregar el campo `date_deadline` antes del campo `is_done`, escribiremos lo siguiente en `arch`:
-```
+
+```xml
 <xpath expr="//field[@name]='is_done'" position="before"> 
   <field name="date_deadline" /> 
 </xpath>
 ```
+
 Afortunadamente, Odoo proporciona la notación de acceso directo para esto, así que la mayoría de las veces podemos evitar la sintaxis XPath por completo. En lugar del elemento XPath anterior, podemos utilizar sólo la información relacionada con el tipo de tipo de elemento para localizar y sus atributos distintivos, y en lugar de la anterior XPath, escribimos esto:
-```
+
+```xml
 <field name="is_done" position="before"> 
   <field name="date_deadline" /> 
 </field>
 ```
+
 Sólo ten en cuenta que si el campo aparece más de una vez en la misma vista, siempre debe utilizar la sintaxis XPath. Esto es porque Odoo se detendrá en la primera aparición del campo y puede aplicar sus cambios al campo incorrecto.
 
 A menudo, queremos agregar nuevos campos junto a los existentes, por lo que la etiqueta `<field>` se utilizará como localizador con frecuencia. Pero cualquier otra etiqueta se puede utilizar: `<sheet>, <group>, <div>`, etc. El atributo `name` suele ser la mejor opción para los elementos coincidentes, pero a veces, es posible que necesitemos utilizar otra cosa: el elemento de `CSS class`, por ejemplo. Odoo encontrará el primer elemento que tiene al menos todos los atributos especificados.
@@ -213,40 +220,39 @@ El atributo `position` utilizado con el elemento localizador es opcional y puede
 + `attributes` modifica los atributos XML del elemento emparejado. Esto se hace utilizando en los elementos del contenido `<attribute name = "attr-name">` con los nuevos valores de atributo que se deben establecer.
 
 Por ejemplo, en el formulario Tarea, tenemos el campo activo, pero tenerlo visible no es tan útil. Podríamos ocultarlo del usuario. Esto puede hacerse estableciendo su atributo `invisible`:
-```
+
+```xml
 <field name="active" position="attributes"> 
   <attribute name="invisible">1</attribute> 
 </field>
 ```
+
 Establecer el atributo `invisible` para ocultar un elemento es una buena alternativa para usar el localizador `replace` para eliminar nodos. Se debe evitar la eliminación de nodos, ya que puede romper módulos dependientes que pueden depender del nodo eliminado como marcador de posición para agregar otros elementos.
 
 #### Ampliando de la vista de formulario
 
 Juntando todos los elementos de formulario anteriores, podemos agregar los nuevos campos y ocultar el campo `active`. La vista de herencia completa para ampliar el formulario de tareas pendientes es la siguiente:
-```
-<record id="view_form_todo_task_inherited"   
-  model="ir.ui.view"> 
-  <field name="name">Todo Task form - User 
-    extension</field> 
-  <field name="model">todo.task</field> 
-  <field name="inherit_id"   
-    ref="todo_app.view_form_todo_task"/> 
-  
-<field name="arch" type="xml"> 
+
+```xml
+<record id="view_form_todo_task_inherited"
+        model="ir.ui.view">
+    <field name="name">Todo Task form - User
+        extension
+    </field>
+    <field name="model">todo.task</field>
+    <field name="inherit_id"
+           ref="todo_app.view_form_todo_task"/>
+    <field name="arch" type="xml">
     <field name="name" position="after">
-      <field name="user_id">
-    </field> 
-    <field name="is_done" position="before"> 
-      <field name="date_deadline" /> 
-    </field> 
-    <field name="active" position="attributes"> 
-      <attribute name="invisible">1</attribute> 
-    </field> 
-  </field>
-
-
-
- 
+        <field name="user_id">
+        </field>
+        <field name="is_done" position="before">
+            <field name="date_deadline"/>
+        </field>
+        <field name="active" position="attributes">
+            <attribute name="invisible">1</attribute>
+        </field>
+    </field>
 </record> 
 ```
 Esto debe agregarse a un archivo `views / todo_task.xml` en nuestro módulo, dentro del elemento `<odoo>`, como se muestra en el capítulo anterior.
@@ -256,84 +262,55 @@ Esto debe agregarse a un archivo `views / todo_task.xml` en nuestro módulo, den
 Las vistas heredadas también se pueden heredar, pero como esto crea dependencias más intrincadas, debe evitarse. Debes preferir heredar de la vista original siempre que sea posible.
 
 Además, no debemos olvidar añadir el atributo `data` al archivo descriptor `__manifest__.py`:
+
 ```
 'data': ['views/todo_task.xml'],
 ```
+
 ### Ampliandola vista de árbol y búsqueda
 
 Las extensiones de vista de árbol y búsqueda también se definen utilizando la estructura XML de `arch`, y pueden extenderse de la misma forma que las vistas de formulario. Continuaremos nuestro ejemplo ampliando las vistas de lista y de búsqueda.
 
 Para la vista de lista, queremos añadirle el campo de usuario:
-```
-<record id="view_tree_todo_task_inherited"   
-  model="ir.ui.view"> 
-  <field name="name">Todo Task tree - User 
-  extension</field> 
-  <field name="model">todo.task</field> 
-  
-<field name="inherit_id"   
 
-
-
-
-
-    ref="todo_app.view_tree_todo_task"/>
-
-
-
- 
-  <field name="arch" type="xml"> 
-   
- <field name="name" position="after"> 
-      <field name="user_id" /> 
+```xml
+<record id="view_tree_todo_task_inherited"
+        model="ir.ui.view">
+    <field name="name">Todo Task tree - User
+        extension
     </field>
-
-
-
- 
-  </field 
-</record> 
+    <field name="model">todo.task</field>
+    <field name="inherit_id"
+           ref="todo_app.view_tree_todo_task"/>
+    <field name="arch" type="xml">
+        <field name="name" position="after">
+            <field name="user_id"/>
+        </field>
+    </field>
+</record>
 ```
+
 Para la vista de búsqueda, agregamos la búsqueda por el usuario y filtros predefinidos para las propias tareas del usuario y las tareas no asignadas a nadie:
-```
-<record id="view_filter_todo_task_inherited"    
-  model="ir.ui.view"> 
-  <field name="name">Todo Task tree - User 
-    extension</field> 
-  <field name="model">todo.task</field> 
- 
- <field name="inherit_id" 
 
-
-
-
-
-  ref="todo_app.view_filter_todo_task"/>
-
-
-
- 
-  <field name="arch" type="xml"> 
-    
-<field name="name" position="after"> 
-      <field name="user_id" /> 
-      <filter name="filter_my_tasks" string="My Tasks" 
-        domain="[('user_id','in',[uid,False])]" /> 
-      <filter name="filter_not_assigned" string="Not 
-
-
-
-
-
-        Assigned" domain="[('user_id','=',False)]" /> 
+```xml
+<record id="view_filter_todo_task_inherited"
+        model="ir.ui.view">
+    <field name="name">Todo Task tree - User
+        extension
     </field>
-
-
-
- 
-  </field 
+    <field name="model">todo.task</field>
+    <field name="inherit_id"
+           ref="todo_app.view_filter_todo_task"/>
+    <field name="arch" type="xml">
+        <field name="name" position="after">
+            <field name="user_id"/>
+            <filter name="filter_my_tasks" string="My Tasks"
+                    domain="[('user_id','in',[uid,False])]"/>
+            <filter name="filter_not_assigned" string="Not 
+        Assigned" domain="[('user_id','=',False)]"/>
+        </field>
+    </field>
 </record> 
-
 ```
 
 No se preocupe demasiado por la sintaxis específica de estas vistas. Los cubriremos con más detalle en el Capítulo 6, *Vistas - Diseñando la interfaz de usuario*.
@@ -353,7 +330,8 @@ Exploremos estas posibilidades con más detalle.
 El método que usamos antes para extender un modelo utiliza sólo el atributo `_inherit`. Definimos una clase heredando el modelo `todo.task` y le agregamos algunas características. El atributo de clase `_name` no se estableció explícitamente; Implícitamente, era `todo.task`.
 
 Sin embargo, el uso del atributo `_name` nos permite crear un nuevo modelo copiando las características de las heredadas. Aquí hay un ejemplo:
-```
+
+```py
 from odoo import models 
 class TodoTask(models.Model): 
     _name = 'todo.task' 
@@ -373,7 +351,8 @@ Odoo también proporciona el mecanismo de herencia de delegación que evita la d
 La herencia de delegación se utiliza menos frecuentemente, pero puede proporcionar soluciones muy convenientes. Se utiliza a través del atributo `_inherits` (nota la `s` adicional) con mapeo de diccionario modelos heredados con campos que se enlazan a ellos.
 
 Un buen ejemplo de esto es el modelo de usuario estándar, `res.users`; Tiene un modelo de Socio incrustado en él:
-```
+
+```py
 from odoo import models, fields 
 class User(models.Model): 
     _name = 'res.users' 
@@ -404,18 +383,23 @@ Las características de mensajería de redes sociales son proporcionadas por el 
 Sigamos la siguiente lista de verificación.
 
 En cuanto al primer punto, nuestro módulo de extensión necesitará la dependencia adicional de `mail` en el módulo `__manifest__.py manifest file`:
-```
+
+```py
 'depends': ['todo_app', 'mail'],
 ```
+
 Con respecto al segundo punto, la herencia en `mail.thread` se hace usando el atributo `_inherit` que utilizamos antes. Pero nuestra extensión de tareas pendientes ya está usando el atributo `_inherit`. Afortunadamente, puede aceptar una lista de modelos de los que heredar, por lo que podemos usar esto para que también incluya la herencia en `mail.thread`:
-```
+
+```py
 _name = 'todo.task' 
 _inherit = ['todo.task', 'mail.thread']
 ```
+
 `mail.thread` es un modelo abstracto. Los **modelos abstractos** son como modelos regulares, excepto que no tienen una representación de base de datos; no se crean tablas reales para ellos. Los modelos abstractos no están destinados a ser utilizados directamente. En su lugar, se espera que se utilizan como clases mixin, como acabamos de hacer. Podemos pensar en ellos como plantillas con características listas para usar. Para crear una clase abstracta, solo la necesitamos para usar models.AbstractModel en lugar de models.Model para la clase que los define.
 
 Para el tercer punto, queremos agregar los widgets de red social en la parte inferior del formulario. Esto se hace extendiendo la definición de vista de formulario. Podemos reutilizar la vista heredada que ya hemos creado, `view_form_todo_task_inherited`, y añadirla a sus datos `arch`:
-```
+
+```xml
 <sheet position="after"> 
   <div class="oe_chatter"> 
     <field name="message_follower_ids" 
@@ -442,16 +426,19 @@ Dado que se puede acceder a los registros de otros módulos con un identificador
 Ten en cuenta que dado que el punto está reservado para separar el nombre del módulo del identificador de objeto, no se puede utilizar en los nombres de identificador. En su lugar, utiliza la opción subrayado.
 
 ### Modificando el menú y acciones de registro
-`
+
 Como ejemplo, cambiemos la opción de menú creada por el módulo `todo_app` a `My To-Do`. Para ello, podemos agregar lo siguiente al archivo `todo_user / views / todo_task.xml`:
-```
+
+```xml
 <!-- Modify menu item --> 
 <record id="todo_app.menu_todo_task" model="ir.ui.menu"> 
   <field name="name">My To-Do</field> 
 </record>
 ```
+
 También podemos modificar la acción utilizada en el ítem menú. Las acciones tienen un atributo contextual opcional. Puede proporcionar valores predeterminados para campos de vista y filtros. Lo utilizaremos para activar de forma predeterminada el filtro **Mis tareas**, definido anteriormente en este capítulo:
-```
+
+```xml
 <!-- Action to open To-Do Task list --> 
 <record model="ir.actions.act_window"
   id="todo_app.action_todo_task"> 
@@ -469,11 +456,9 @@ Además, ahora las tareas pueden tener usuarios asignados a ellos, por lo que ti
 
 El plan sería el mismo que lo hicimos para el elemento del ítem menú: sobreescribir `todo_app.todo_task_user_rule` para modificar el campo `domain_force` a un nuevo valor.
 
-
-
-
 La idea es mantener los archivos de seguriad relacionados en un subdirectorio `segurity`, por lo que crearemos un archivo `security / todo_access_rules.xml` con el siguiente contenido:
-```
+
+```xml
 <?xml version="1.0" encoding="utf-8"?> 
 <odoo> 
   <data noupdate="1"> 
@@ -501,15 +486,18 @@ La regla de registro se ejecuta en un contexto en el que una variable `user` est
 El campo de grupos es una relación de muchos. La edición de datos en estos campos utiliza una notación especial. El código `4` utilizado aquí es para añadir a la lista de registros relacionados. También se utiliza con frecuencia el código `6`, para reemplazar completamente los registros relacionados con una nueva lista. Podremos analizar esta notación con mayor detalle en el Capítulo 4, *Datos del Módulo*.
 
 El atributo `noupdate = "1"` del elemento de registro significa que estos datos de registro sólo se escribirán en las acciones de instalación y se ignorarán en las actualizaciones del módulo. Esto permite su personalización, sin asumir los riesgos de sobrescribir personalizaciones y perderlas al hacer una actualización de módulo en algún momento en el futuro.
-####Tip
+
+#### Tip
+
 Trabajar en archivos de datos con `<data noupdate ="1">` en el momento del desarrollo puede ser complicado porque las ediciones posteriores de la definición XML serán ignoradas en las actualizaciones de módulos. Para evitar esto, puedes volver a instalar el módulo. Esto es más fácil hecho a través de la línea de comandos usando el `-i`
 
 Como de costumbre, no debemos olvidar agregar el nuevo archivo al atributo de datos en el `__manifest__.py`:
-```
+
+```py
 'data': ['views/todo_task.xml', 'security/todo_access_rules.xml'], 
 ```
 
-# Resumen
+## Resumen
 
 Ahora deberías ser capaz de crear tus propios módulos extendiendo los existentes.
 
