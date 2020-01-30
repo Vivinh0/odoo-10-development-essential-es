@@ -153,7 +153,7 @@ Asegúrate de que tu sesión de cliente web está funcionando con la base de dat
 
 La opción **Aplicaciones** nos muestra la lista de módulos disponibles. De forma predeterminada, muestra sólo los módulos de aplicación. Ya que hemos creado un módulo de aplicación, no necesitamos eliminar ese filtro para verlo. Escribe `todo` en la búsqueda y debes ver nuestro nuevo módulo, listo para ser instalado:
 
-![Installed]file:img/2-01.jpg)
+![Installed]./img/2-01.jpg)
 
 Ahora haZ clic en el botón **Instalar** del módulo y ¡estamos listos!
 
@@ -229,14 +229,15 @@ Luego, tenemos el atributo modelo `_description `. No es obligatorio, pero propo
 Las tres últimas líneas definen los campos del modelo. Vale la pena señalar que `name` y `active` son nombres de campos especiales. De forma predeterminada, Odoo usará el campo de `name` como el título del registro al referenciarlo de otros modelos. El campo `active` se utiliza para inactivar los registros y, por defecto, sólo los registros activos serán mostrados. Lo utilizaremos para borrar las tareas completadas sin eliminarlas de la base de datos.
 
 En este momento, este archivo aún no es utilizado por el módulo. Debemos decirle a Python que lo cargue con el módulo en el archivo `__init__.py`. Vamos a editarlo para agregar la siguiente línea:
+
 ```
-from . Importar todo_modelo
+from . importar todo_modelo
 ```
 ¡Eso es! Para que nuestros cambios de código de Python entren en vigor, la instancia de servidor debe reiniciarse (a menos que esté utilizando el modo `--dev`).
 
 No veremos ninguna opción de menú para acceder a este nuevo modelo ya que no los hemos añadido aún. Sin embargo, podemos inspeccionar el modelo recién creado usando el menú **Technical**. En el menú superior **Settings**, ve a **Technical | Database Structure | Models**, busca el modelo `todo.task` en la lista y haz clic en él para ver su definición:
 
-![Settings](file:img/2-02.jpg)
+![Settings](./img/2-02.jpg)
 
 Si todo va bien, se confirma que el modelo y los campos fueron creados. Si no puedes verlos aquí, intenta reiniciar el servidor con una actualización de módulo, como se describió anteriormente.
 
@@ -294,7 +295,7 @@ La capa de vista describe la interfaz de usuario. Las vistas se definen mediante
 
 Tenemos elementos de menú que pueden activar acciones que pueden hacer vistas. Por ejemplo, la opción de menú **Usuarios** procesa una acción también denominada **Usuarios**, que a su vez genera una serie de vistas. Existen varios tipos de vista disponibles, como las vistas de lista y formulario y las opciones de filtro también disponíbles, están definidas por un tipo particular de vista, la vista de búsqueda.
 
-Las directrices de desarrollo de Odoo establecen que los archivos XML que definen la interfaz de usuario deben colocarse dentro de un subdirectorio `views /` subdirectorio
+Las directrices de desarrollo de Odoo establecen que los archivos XML que definen la interfaz de usuario deben colocarse dentro de un subdirectorio `views/subdirectorio`
 Comencemos a crear la interfaz de usuario para nuestra aplicación de tareas pendientes.
 ###Agregar elementos de menú
 
@@ -330,14 +331,14 @@ La interfaz de usuario, incluidas las opciones y las acciones de menú, se almac
 Ambos elementos incluyen un atributo id. Este atributo id también llamado **XML ID**, es muy importante: se utiliza para identificar de forma única cada elemento de datos dentro del módulo, y puede ser utilizado por otros elementos para referenciarlo. En este caso, el elemento `<menuitem>` necesita hacer referencia a la acción para procesar, y necesita hacer uso de la <act_window> ID para eso. Los ID XML se tratan con mayor detalle en el Capítulo 4, *Datos del módulo*
 
 Nuestro módulo aún no conoce el nuevo archivo de datos XML. Esto se hace agregándolo al atributo de datos en el archivo `__manifest__.py`. Este, contiene la lista de archivos a cargar por el módulo. Agregue este atributo al diccionario del manifiesto:
-```
 
-'Data': ['views / todo_menu.xml'],
+```
+'data': ['views/todo_menu.xml'],
 ```
 
 Ahora necesitamos actualizar el módulo de nuevo para que estos cambios surtan efecto. Vaya al menú superior de **Todos** y debe ver nuestra nueva opción de menú disponible:
 
-![Save](file:img/2-03.jpg)
+![Save](./img/2-03.jpg)
 
 Aunque no hemos definido nuestra vista de interfaz de usuario, al hacer clic en el menú **Todos** se abrirá un formulario generado automáticamente para nuestro modelo, lo que nos permitirá agregar y editar registros.
 
@@ -696,7 +697,7 @@ Si ejecutamos las pruebas ahora, deberían fallar, así que nos encargamos de es
 
 Para obtener una imagen de qué información se necesita para agregar reglas de acceso a un modelo, utiliza el cliente web y ve a **Settings | Technical | Security | Access Controls List** :
 
-![Create](file:img/2-04.jpg)
+![Create](./img/2-04.jpg)
 
 ### Nota
 
