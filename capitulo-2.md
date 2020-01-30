@@ -306,8 +306,7 @@ Para ello, debemos añadir una opción de menú para abrir el modelo `To–do Ta
 Cree el archivo `views / todo_menu.xml` para definir un elemento de menú y la acción realizada por él:
 
 
-```
-
+```xml
 <?xml version="1.0"?> 
 <odoo> 
   <!-- Action to open To-do Task list --> 
@@ -320,7 +319,6 @@ Cree el archivo `views / todo_menu.xml` para definir un elemento de menú y la a
     name="Todos" 
     action="action_todo_task" /> 
 </odoo> 
-
 ```
 
 La interfaz de usuario, incluidas las opciones y las acciones de menú, se almacena en las tablas de la base de datos. El archivo XML es un archivo de datos utilizado para cargar esas definiciones en la base de datos cuando el módulo se instala o actualiza. El código anterior es un archivo de datos Odoo, que describe dos registros para añadir a Odoo:
@@ -332,7 +330,7 @@ Ambos elementos incluyen un atributo id. Este atributo id también llamado **XML
 
 Nuestro módulo aún no conoce el nuevo archivo de datos XML. Esto se hace agregándolo al atributo de datos en el archivo `__manifest__.py`. Este, contiene la lista de archivos a cargar por el módulo. Agregue este atributo al diccionario del manifiesto:
 
-```
+```python
 'data': ['views/todo_menu.xml'],
 ```
 
@@ -356,40 +354,32 @@ Odoo admite varios tipos de vistas, pero las tres más importantes son: `tree` (
 Todas las vistas se almacenan en la base de datos, en el modelo `ir.ui.view`. Para añadir una vista a un módulo, declaramos un elemento `<record>` que describe la vista en un archivo XML, que se va a cargar en la base de datos cuando se instala el módulo.
 
 Agregue este nuevo archivo `views / todo_view.xml` para definir nuestra vista de formulario:
-```
-<?xml version="1.0"?> 
-<odoo> 
-  <record id="view_form_todo_task" model="ir.ui.view"> 
-    <field name="name">To-do Task Form</field> 
-    <field name="model">todo.task</field> 
-    <field name="arch" type="xml"> 
-     
- <form string="To-do Task"> 
 
-
-
-
-
-        <group>
-          <field name="name"/> 
-          <field name="is_done"/> 
-          <field name="active" readonly="1"/> 
-
-
-
-
-
-        </group> 
-      </form>
-
-
-
- 
-    </field> 
-  </record> 
+```xml
+<?xml version="1.0"?>
+<odoo>
+    <record id="view_form_todo_task" model="ir.ui.view">
+        <field name="name">To-do Task Form</field>
+        <field name="model">todo.task</field>
+        <field name="arch" type="xml">
+            <form string="To-do Task">
+                <group>
+                    <field name="name"/>
+                    <field name="is_done"/>
+                    <field name="active" readonly="1"/>
+                </group>
+            </form>
+        </field>
+    </record>
 </odoo> 
 ```
-Recuerde agregar este nuevo archivo a la clave de datos en el archivo de manifiesto, de lo contrario, nuestro módulo no lo sabrá y no se cargará.
+
+**Importante:** recuerde agregar este nuevo archivo a la clave de datos en el archivo de manifiesto, de lo contrario, nuestro módulo no lo sabrá y no se cargará.
+
+```python
+'data': ['views/todo_menu.xml',
+         'views/todo_view.xml'],
+```
 
 Esto agregará un registro al modelo `ir.ui.view` con el identificador `view_form_todo_task`. La vista es para el modelo `todo.task` y se denomina `To-do Task Form`. El nombre es solo para información; No tiene que ser único, pero debe permitir que uno identifique fácilmente a qué registro se refiere. De hecho, el nombre puede ser totalmente omitido, en ese caso, se generará automáticamente a partir del nombre del modelo y el tipo de vista.
 
@@ -400,40 +390,21 @@ El atributo más importante es `arch`, y contiene la definición de la vista, re
 La sección anterior proporcionó una vista de formulario básica, pero podemos hacer algunas mejoras en ella. Para los modelos de documentos, Odoo tiene un estilo de presentación que imita una página en papel. Este formulario contiene dos elementos: `<header>` para contener los botones de acción y `<sheet>` para contener los campos de datos.
 
 Ahora podemos reemplazar el `<form>` básico definido en la sección anterior por éste:
-```
-<header>
 
-
-
- 
-  <!-- Buttons go here--> 
- 
- </header> 
-
-
-
-
-
-
-<sheet>
-
-
-
- 
-    <!-- Content goes here: --> 
-    <group>
-      <field name="name"/> 
-      <field name="is_done"/>
-      <field name="active" readonly="1"/>
-    </group>
-
-  </sheet>
-
-
-
- 
-</form> 
-
+```xml
+<form>
+    <header> 
+        <!-- Buttons go here--> 
+    </header> 
+    <sheet>
+        <!-- Content goes here: --> 
+        <group>
+            <field name="name"/> 
+            <field name="is_done"/>
+            <field name="active" readonly="1"/>
+        </group>
+    </sheet>
+</form>
 ```
 
 ### Añadiendo botones de acción
