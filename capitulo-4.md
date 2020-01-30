@@ -22,7 +22,7 @@ Para inspeccionar los mapeos existentes, ve a la sección **Technical** del men�
 
 Por ejemplo, si visitamos la lista de **External identifiers** y lo filtramos por el módulo `todo_app`, veremos los identificadores externos generados por el módulo creado anteriormente:
 
-![Externalidentifiers](file:img/4-01.jpg)
+![Externalidentifiers](./img/4-01.jpg)
 
 Podemos ver que los identificadores externos tienen una etiqueta **ID Completa**. Observa cómo se compone del nombre del módulo y el nombre del identificador unido por un punto, por ejemplo, `todo_app.action_todo_task`.
 
@@ -32,7 +32,7 @@ Cuando se utiliza un identificador externo en un archivo de datos, puedes elegir
 
 En la parte superior de la lista, tenemos el identificador completo `todo_app.action_todo_task`. Esta es la acción de menú que creamos para el módulo, al que también se hace referencia en el ítem de menú correspondiente. Al hacer clic en él, vamos a la vista de formulario con sus detalles; El identificador externo `action_todo_task` en el módulo `todo_app` mapea un ID de registro específico en el modelo `ir.actions.act_window`, `72` en este caso:
 
-![Todo](file:img/4-02.jpg)
+![Todo](./img/4-02.jpg)
 
 Además de proporcionar una forma para que los registros hagan referencia fácilmente a otros registros, los identificadores externos también te permiten evitar la duplicación de datos en las importaciones repetidas. Si el identificador externo ya está presente, se actualizará el registro existente; No es necesario crear un nuevo registro. Es por esto que en las actualizaciones de módulos posteriores, los registros cargados previamente se actualizan en vez de duplicarse.
 
@@ -46,7 +46,7 @@ Para encontrar el identificador externo de un registro de datos, en la vista de 
 
 Como ejemplo, para buscar el ID de `demo user`, podemos navegar a la vista de formulario, en **Settings | Users** y seleccione la opción **View Metadata** y esto se mostrará:
 
-![Metadata](file:img/4-03.jpg)
+![Metadata](./img/4-03.jpg)
 
 Para hallar el identificador externo para elementos de vista, como formulario, árbol, búsqueda o acción, el menú **Developer** también es una buena fuente de ayuda. Para ello, podemos utilizar la opción **Manage Views** o abrir la información para la vista deseada mediante la opción **Edit <view type>**. A continuación, selecciona la opción **View metadata**.
 
@@ -60,7 +60,7 @@ La exportación de datos es una característica estándar disponible en cualquie
 
 He aquí un ejemplo, usando las tareas de tareas pendientes creadas recientemente:
 
-![Todocreate]((file:img/4-04.jpg)
+![Todocreate]((./img/4-04.jpg)
 
 También podemos marcar la casilla de verificación en el encabezado de la columna. Comprobará todos los registros a la vez y exportará todos los registros que coincidan con los criterios de búsqueda actuales.
 
@@ -72,7 +72,7 @@ La opción **Export** nos lleva a un formulario de diálogo, donde podemos elegi
 
 El formato de exportación puede ser CSV o Excel. Preferiremos un archivo CSV para obtener una mejor comprensión del formato de exportación. A continuación, seleccionamos las columnas que queremos exportar y hacemos clic en el botón **Export to File**. Esto iniciará la descarga de un archivo con los datos exportados:
 
-![Minion](file:img/4-05.jpg)
+![Minion](./img/4-05.jpg)
 
 Si seguimos estas instrucciones y seleccionamos los campos mostrados en la captura de pantalla anterior, deberíamos terminar con un archivo de texto CSV similar a este:
 
@@ -81,7 +81,6 @@ Si seguimos estas instrucciones y seleccionamos los campos mostrados en la captu
 "todo_user.todo_task_a","Install Odoo","base.user_root","2015-01-30","False" 
 "__export__.todo_task_9","Create my first module","base.user_root","","False"
 ```
-
 
 #### Nota
 
@@ -105,7 +104,7 @@ Después de guardar los cambios en el archivo CSV, haz clic en la opción **Impo
 
 Allí, debemos seleccionar la ubicación del archivo CSV en el disco y hacer clic en **Validate** para comprobar su exactitud. Ya que que el archivo a importar se basa en una exportación Odoo, lo más probable es que sea válido:
 
-![Minion]((file:img/4-06.jpg)
+![Minion]((./img/4-06.jpg)
 
 Ahora podemos hacer clic en **Import**, y ahí lo tienes; Nuestras modificaciones y nuevos registros deberían haber sido cargados en Odoo.
 
@@ -121,20 +120,22 @@ Las columnas de la relación deben tener `/ id` añadido a su nombre si utilizan
 Del mismo modo, también se apoyan las relaciones de muchos a muchos. Un ejemplo de una relación muchos-a-muchos es el que existe entre usuarios y grupos: cada usuario puede estar en muchos grupos y cada grupo puede tener muchos usuarios. El nombre de columna para este tipo de campo debe tener `/ id` añadido. Los valores de campo aceptan una lista separada por comas de identificadores externos, rodeada de comillas dobles.
 
 Por ejemplo, los seguidores de tareas pendientes tienen una relación muchos-a-muchos entre las tareas por realizar y los socios. Su nombre de columna debe ser `follower_ids / id`, y un valor de campo con dos seguidores podría tener este aspecto:
+
 ```
 "__export__.res_partner_1,__export__.res_partner_2"
 ```
+
 Finalmente, las relaciones uno-a-muchos también se pueden importar a través de un archivo CSV. El ejemplo típico para este tipo de relación es un documento *cabecera* de documento con varias *líneas*. Observa que una relación de uno a muchos es siempre la inversa de una relación de muchos a uno. Cada *cabecera* del documento puede tener muchas *líneas* e inversamente cada línea tiene una *cabecera*.
 
 Podemos ver un ejemplo de tal relación en el modelo de empresa (la vista de formulario está disponible en el menú **Settings**): cada empresa puede tener varias cuentas bancarias, cada una con sus propios detalles; Inversamente, cada registro de cuenta bancaria pertenece y tiene una relación de muchos a uno con una sola compañía.
 
 Podemos importar empresas junto con sus cuentas bancarias en un solo archivo. Aquí hay un ejemplo donde cargamos una empresa con tres bancos:
+
 ```
 id,name,bank_ids/id,bank_ids/acc_number,bank_ids/state 
 base.main_company,YourCompany,__export__.res_partner_bank_4,123456789,bank 
 ,,__export__.res_partner_bank_5,135792468,bank 
 ,,__export__.res_partner_bank_6,1122334455,bank
-
 ```
 
 Podemos ver que las dos primeras columnas, `id` y `name`, tienen valores en la primera línea y están vacíos en las dos líneas siguientes. Tienen datos para el registro de la cabeza, que es la empresa.
@@ -158,26 +159,32 @@ Los módulos addon de Odoo pueden instalar datos de demostración, y se consider
 Es hora de agregar algunos datos de demostración a nuestro módulo `todo_user`. Podemos comenzar exportando algunos datos de las tareas pendientes, como se explicó en la sección anterior. La convención es colocar los archivos de datos en un subdirectorio `data/`. Así que debemos guardar estos archivos de datos en el módulo addon `todo_user` como `data / todo.task.csv`. Dado que estos datos serán propiedad de nuestro módulo, deberíamos editar los valores de ID para eliminar el prefijo `__export__` de los identificadores.
 
 Por ejemplo, nuestro archivo de datos `todo.task.csv` podría tener este aspecto:
+
 ```
 id,name,user_id/id,date_deadline 
 todo_task_a,"Install Odoo","base.user_root","2015-01-30" 
 todo_task_b","Create dev database","base.user_root","" 
 ```
+
 no debemos olvidar añadir este archivo de datos al atributo `demo` `__manifest__.py`:
-```
+
+```py
 'demo': ['data/todo.task.csv'], 
 ```
+
 La próxima vez que actualizemos el módulo, siempre y cuando se instale con los datos de demostración habilitados, se importará el contenido del archivo. Ten en cuenta que estos datos se reimportarán siempre que se realice una actualización de módulo.
 
 Los archivos XML también se utilizan para cargar los datos del módulo. Vamos a aprender más acerca de lo que los archivos de datos XML pueden hacer que los archivos CSV no pueden.
 
 ## Archivo de datos XML
+
 Mientras que los archivos CSV proporcionan un formato simple y compacto para representar datos, los archivos XML son más potentes y dan más control sobre el proceso de carga. Sus nombres de archivo no son necesarios para coincidir con el modelo que se va a cargar. Esto se debe a que el formato XML es mucho más rico y esa información es proporcionada por los elementos XML dentro del archivo.
 
 Ya hemos utilizado archivos de datos XML en los capítulos anteriores. Los componentes de la interfaz de usuario, tales como vistas y elementos de menú, son de hecho registros almacenados en modelos de sistema. Los archivos XML en los módulos son los medios utilizados para cargar estos registros en el servidor.
 
 Para mostrar esto, agregaremos un segundo archivo de datos al módulo `todo_user`, `data / todo_data.xml`, con el siguiente contenido:
-```
+
+```xml
 <?xml version="1.0"?> 
 <odoo> 
   <!-- Data to load --> 
@@ -189,6 +196,7 @@ Para mostrar esto, agregaremos un segundo archivo de datos al módulo `todo_user
   </record> 
 </odoo> 
 ```
+
 Este XML es equivalente al archivo de datos CSV que acabamos de ver en la sección anterior.
 
 Los archivos de datos XML tienen un elemento superior `<odoo>`, dentro del cual podemos tener varios elementos `<record>` que corresponden a las filas de datos CSV.
@@ -218,7 +226,7 @@ El atributo `noupdate` puede ser complicado al desarrollar módulos, ya que los 
 
 ### Definiendo registros en XML
 
-Cada elemento `<record>` tiene dos atributos básicos, `id` y `model`, y contiene elementos `<field>` que asignan valores a cada columna. Como se mencionó anteriormente, el atributo `id` corresponde al identificador externo del registro y al atributo `model` al modelo de destino en el que se escribirá el registro. Los elementos <field> tienen diferentes formas de asignar valores. Echemos un vistazo a ellos en detalle.
+Cada elemento `<record>` tiene dos atributos básicos, `id` y `model`, y contiene elementos `<field>` que asignan valores a cada columna. Como se mencionó anteriormente, el atributo `id` corresponde al identificador externo del registro y al atributo `model` al modelo de destino en el que se escribirá el registro. Los elementos `<field>` tienen diferentes formas de asignar valores. Echemos un vistazo a ellos en detalle.
 
 #### Configurando de valores de campo
 
@@ -240,15 +248,14 @@ La expresión se evalúa en un contexto que, además de Python incorporado, tamb
 
 Para manejar fechas, están disponibles los siguientes módulos: `time, datetime, timedelta y relativedelta`. Ellos permiten calcular valores de fecha, algo que se utiliza con frecuencia en los datos de demostración y prueba, de modo que las fechas utilizadas están cerca de la fecha de instalación del módulo. Por ejemplo, para establecer un valor para ayer, utilizaremos esto:
 
-```
+```xml
 <field name="date_deadline" 
   eval="(datetime.now() + timedelta(-1)).strftime('%Y-%m-%d')" />
 ```
 
-
 También está disponible en el contexto de evaluación la función `ref ()`, que se utiliza para traducir un identificador externo en el ID de base de datos correspondiente. Esto se puede usar para establecer valores para campos relacionales. Como ejemplo, lo hemos utilizado antes para establecer el valor de `user_id`:
 
-```
+```xml
 <field name="user_id" eval="ref('base.group_user')" /> 
 ```
 
@@ -257,33 +264,33 @@ También está disponible en el contexto de evaluación la función `ref ()`, qu
 Acabamos de ver cómo establecer un valor en un campo de relación many-to-one, como `user_id`, usando el atributo `eval` con una función `ref ()`. Pero hay una manera más simple.
 
 El elemento `<field>` también tiene un atributo `ref` para establecer el valor de un campo many-to-one, utilizando un identificador externo. Con esto, podemos fijar el valor para `user_id` usando apenas esto:
-```
 
-<Field name = "user_id" ref = "base.user_demo" />
+```xml
+<field name = "user_id" ref = "base.user_demo" />
 ```
 
 Para los campos one-to-many y many-to-many, se espera una lista de IDs relacionados, por lo que se necesita una sintaxis diferente; Odoo proporciona una sintaxis especial para escribir en este tipo de campos.
 
 El siguiente ejemplo, tomado de la aplicación oficial Fleet, reemplaza la lista de registros relacionados de un campo `tag_ids`:
-```
+
+```xml
 <field name="tag_ids" 
   eval="[(6,0,    
     [ref('vehicle_tag_leasing'), 
     ref('fleet.vehicle_tag_compact'), 
     ref('fleet.vehicle_tag_senior')] 
-  )]" /> 
-
+  )]" />
 ```
 
 Para escribir en un campo to-many, usamos una lista de triples. Cada triple es un comando de escritura que hace cosas diferentes según el código usado:
 
-+ (0,_ ,{'field': value}) crea un nuevo regristro y lo enlaza con este 
-+ (1,id,{'field': value}) Actualiza los valores en un registro previamente enlazado
-+ (2,id,_) Desenlaza y elimina un registro relacionado 
-+ (3,id,_) Desenlaza pero no elimina un registro relacionado 
-+ (4,id,_) Enlaza un registro ya existente
-+ (5,_,_) Desenlaza pero no elimina todos los registros relacionados
-+ (6,_,[ids]) reemplaza la lista de registros enlazados con la lista proporcionada
++ `(0,_ ,{'field': value})` crea un nuevo regristro y lo enlaza con este.
++ `(1,id,{'field': value})` Actualiza los valores en un registro previamente enlazado.
++ `(2,id,_)` Desenlaza y elimina un registro relacionado.
++ `(3,id,_)` Desenlaza pero no elimina un registro relacionado.
++ `(4,id,_)` Enlaza un registro ya existente.
++ `(5,_,_)` Desenlaza pero no elimina todos los registros relacionados.
++ `(6,_,[ids])` reemplaza la lista de registros enlazados con la lista proporcionada.
 
 El símbolo de subrayado utilizado en la lista anterior representa valores irrelevantes, normalmente se rellenan con `0` o `False`.
 
@@ -309,7 +316,7 @@ Hasta ahora, hemos visto cómo agregar o actualizar datos usando archivos XML. P
 
 Para eliminar un registro de datos, usamos el elemento `<delete>`, proporcionándolo con un ID o un dominio de búsqueda para encontrar el registro de destino. Por ejemplo, el uso de un dominio de búsqueda para encontrar el registro que desea eliminar se ve así:
 
-```
+```xml
 <delete 
   model="ir.rule" 
   search="
@@ -319,7 +326,7 @@ Para eliminar un registro de datos, usamos el elemento `<delete>`, proporcionán
 
 Puesto que en este caso conocemos el ID específico a eliminar, podríamos haberlo utilizado directamente para el mismo efecto:
 
-```
+```xml
 <delete model="ir.rule" id="todo_app.todo_task_user_rule" /> 
 ```
 
@@ -327,25 +334,24 @@ Puesto que en este caso conocemos el ID específico a eliminar, podríamos haber
 
 Un archivo XML también puede ejecutar métodos durante su proceso de carga a través del elemento `<function>`. Esto se puede utilizar para configurar datos de demostración y de prueba. Por ejemplo, la aplicación CRM lo utiliza para configurar datos de demostración:
 
-```
+```xml
 <function  
    model="crm.lead"  
    name="action_set_lost" 
    eval="[ref('crm_case_7'), ref('crm_case_9') 
          , ref('crm_case_11'), ref('crm_case_12')] 
          , {'install_mode': True}" /> 
-
 ```
 
 Esto llama al método `action_set_lost` del modelo `crm.lead`, pasando dos argumentos a través del atributo `eval`. El primero es la lista de IDs para trabajar, y el siguiente es el contexto a utilizar.
 
 Otra forma en que los archivos de datos XML pueden realizar acciones es desencadenando flujos de trabajo Odoo a través del elemento `<workflow>`. Los flujos de trabajo pueden, por ejemplo, cambiar el estado de una orden de ventas o  convertirlo en una factura. La aplicación `sale` ya no utiliza flujos de trabajo, pero este ejemplo todavía se puede encontrar en los datos de demostración:
-```
+
+```xml
 <workflow model="sale.order" 
   ref="sale_order_4" 
   action="order_confirm" /> 
 ```
-
 
 El atributo `model` es autoexplicativo por ahora, y `ref` identifica la instancia de flujo de trabajo sobre la que estamos actuando. `action` es la señal de flujo de trabajo enviada a esta instancia de flujo de trabajo.
 
@@ -354,3 +360,5 @@ El atributo `model` es autoexplicativo por ahora, y `ref` identifica la instanci
 Haz aprendido todos los aspectos esenciales sobre la serialización de datos y adquirido una mejor comprensión de los aspectos XML que vimos en los capítulos anteriores. También pasamos un tiempo entendiendo los identificadores externos, un concepto central de manejo de datos en general y configuraciones de módulos en particular. Los archivos de datos XML se explicaron en detalle. Aprendiste acerca de las varias opciones disponibles para establecer valores en campos y también para realizar acciones, como eliminar registros y métodos de modelo de llamada. También se explican los archivos CSV y las funciones de importación / exportación de datos. Estas son herramientas valiosas para la configuración inicial de Odoo o para la edición masiva de datos.
 
 En el próximo capítulo, exploraremos cómo construir modelos Odoo en detalle y aprenderemos más acerca de cómo construir sus interfaces de usuario.
+
+---

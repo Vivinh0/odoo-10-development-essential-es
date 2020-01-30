@@ -509,5 +509,4 @@ Los tres primeros capítulos nos dieron una visión general de las actividades c
 
 Los próximos capítulos se centrarán en un área específica del desarrollo Odoo, la mayoría de los cuales visitamos brevemente en estos primeros capítulos. En el capítulo siguiente, abordaremos la serialización de datos y el uso de archivos de datos XML y CSV con más detalle.
 
-
-
+---
