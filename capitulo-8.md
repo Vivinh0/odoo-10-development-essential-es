@@ -18,12 +18,13 @@ Las pruebas de Python se agregan a módulos addon mediante un subdirectorio `tes
 
 Las pruebas de nuestro complemento `todo_wizard` estarán en un archivo `test/test_wizard.py`. Necesitaremos agregar el archivo `tests/__init__.py`:
 
-```
+```py
 from . import test_wizard
 ```
+
 Y este sería el esqueleto básico para el `tests/test_wizard.py`:
 
-```
+```py
 # -*- coding: utf-8 -*- 
 from odoo.tests.common import TransactionCase 
  
@@ -58,7 +59,7 @@ Es conveniente realizar las acciones de prueba bajo un usuario específico, para
 
 Éste es el código para el método `setUp` y algunas instrucciones de importación adicionales que también son necesarias:
 
-```
+```py
 from datetime import date
 from odoo.tests.common import TransactionCase
 from odoo import fields
@@ -84,8 +85,8 @@ class TestWizard(TransactionCase):
         # Create Wizard instance to use in tests
         Wizard = self.env['todo.wizard'].sudo(demo_user)
         self.wizard = Wizard.create({})
-        
 ```
+
 Para probar nuestro asistente, queremos tener exactamente abiertas dos tareas pendientes. Así que empezamos cerrando cualquier tarea pendiente existente, para que no se interpongan en nuestras pruebas, y creamos dos nuevas tareas pendientes para las pruebas, usando el usuario Demo. Finalmente creamos una nueva instancia de nuestro asistente, utilizando el usuario Demo, y asignandolo a `self.wizard`, de modo que esté disponible para los métodos de prueba.
 
 ## Probando excepciones
@@ -96,14 +97,13 @@ En nuestro ejemplo, el método `test_count()` utiliza una excepción de adverten
 
 Necesitamos importar la excepción `Warning` en la parte superior del archivo:
 
-```
+```py
 from odoo.exceptions import Warning
-
 ```
 
 Y agregua a la clase de prueba un método con otro caso de prueba:
 
-```
+```py
 def test_count(self): 
     "Test count button" 
     with self.assertRaises(Warning) as e: 
@@ -138,9 +138,9 @@ Por estas razones, no haremos una cobertura en profundidad de las pruebas de YAM
 
 Las pruebas YAML son archivos de datos, similares a CSV y XML. De hecho, el formato YAML estaba destinado a ser un formato de datos más compacto que se puede utilizar en lugar de XML. A diferencia de las pruebas Python, donde las pruebas deben estar en un subdirectorio `test/`, los archivos de prueba YAML pueden estar en cualquier parte dentro del módulo de complemento. Pero frecuentemente estarán dentro de un subdirectorio `test/` o `tests/`. Y aunque las pruebas de Python se descubren automáticamente, las pruebas de YAML deben declararse en el archivo de manifiesto `__manifest__.py`. Esto se hace con la clave `test`, similar a la clave `data` que ya conocemos.
 
-En Odoo 10 pruebas YAML ya no se utilizan, pero aquí es un ejemplo, desde el `02_order_to_invoice.yml` en el módulo addon `point_of_sale`:
+En Odoo 10 las pruebas YAML ya no se utilizan, pero aquí hay un ejemplo, desde el `02_order_to_invoice.yml` en el módulo addon `point_of_sale`:
 
-```
+```yaml
 - 
   I click on the "Make Payment" wizard to pay the PoS order 
 - 
@@ -161,7 +161,6 @@ Como puedes ver, las pruebas YAML utilizan una sintaxis específica de Odoo que 
 ## Herramientas de desarrollo
 
 Hay algunas técnicas que el desarrollador debe aprender para ayudar en su trabajo. En el Capítulo 1, *Iniciando con el desarrollo Odoo*, ya hemos introducido la interfaz de usuario del modo de desarrollador **Developer Mode**. También tenemos disponible una opción de servidor que proporciona algunas características amigables para desarrolladores. Lo describiremos más detalladamente a continuación. Después de eso vamos a discutir otro tema relevante para los desarrolladores: cómo depurar el código del lado del servidor.
-
 
 ### Opciones de desarrollo del servidor
 
@@ -191,12 +190,11 @@ Para que esto funcione el paquete Python `watchdog` es necesario, y debe instala
 
 ```
 $ pip install watchdog
-
 ```
+
 #### Nota
 
 Ten en cuenta que esto es útil sólo para los cambios de código Python y arquitecturas de vista en archivos XML. Para otros cambios, como la estructura de datos del modelo, se necesita una actualización del módulo y la recarga no es suficiente.
-
 
 ### Depuración
 
@@ -212,7 +210,6 @@ Para usar el depurador, el mejor enfoque es insertar un punto de interrupción e
 
 ```
 import pdb; pdb.set_trace() 
-
 ```
 
 Ahora reinicia el servidor para que se cargue el código modificado. Tan pronto como la ejecución del programa llegue a esa línea, se mostrará un prompt de Python (`pdb`) en la ventana de terminal donde se está ejecutando el servidor, esperando por nuestra entrada.
@@ -241,7 +238,7 @@ Mientras que `pdb` tiene la ventaja de estar disponible fuera de la caja, puede 
 
 Veamos cómo se ve una simple sesión de depuración. Podemos comenzar añadiendo punto de interrupción del depurador en la primera línea del método del asistente `do_populate_tasks`:
 
-```
+```py
 def do_populate_tasks(self):
     import pdb; pdb.set_trace()
     self.ensure_one()
@@ -287,14 +284,7 @@ Mientras que `pdb` tiene la ventaja de estar disponible fuera de la caja, puede 
 El depurador de hierro de Python, `ipdb`, es una opción popular que utiliza los mismos comandos que `pdb`, pero añade mejoras como la finalización de tabulaciones y el resaltado de sintaxis, para un uso más cómodo. Se puede instalar con:
 
 ```
-
 $ sudo pip install ipdb
-
-
-
-
-
-
 ```
 
 Y se agrega un punto de interrupción con la línea:
@@ -305,20 +295,13 @@ import ipdb; ipdb.set_trace()
 
 Otro depurador alternativo es `pudb`. También soporta los mismos comandos que `pdb` y funciona en terminales sólo de texto, pero utiliza una pantalla gráfica similar a lo que puedes encontrar en un depurador IDE. La información útil, como las variables en el contexto actual y sus valores, está fácilmente disponible en la pantalla en sus propias ventanas:
 
-![debugger](file:img/9-01.jpg)
+![debugger](./img/9-01.jpg)
 
 Se puede instalar a través del gestor de paquetes del sistema o a través de `pip`, como se muestra aquí:
 
 ```
-
 $ sudo apt-get install python-pudb  # using OS packages
-
-
-
-
-
 $ sudo pip install pudb  # using pip, possibly in a virtualenv
-
 ```
 
 La adición de un punto de interrupción `pudb` se hace justo de la manera que esperarías:
@@ -342,6 +325,7 @@ Para eso primero necesitamos encontrar el ID de proceso correspondiente (PID). P
 ```
 $ ps ax | grep odoo-bin
 ```
+
 La primera columna en la salida es el PID para ese proceso. Toma una nota en el PID para el proceso de inspección, ya que lo necesitaremos a continuación.
 
 Ahora queremos enviar una señal al proceso. El comando utilizado para hacer eso es matar "kill". De forma predeterminada envía una señal para finalizar un proceso, pero también puede enviar otras señales más amigables.
@@ -349,12 +333,7 @@ Ahora queremos enviar una señal al proceso. El comando utilizado para hacer eso
 Conociendo el PID para nuestro proceso de servidor Odoo en ejecución, podemos imprimir las trazas del código que se está ejecutando actualmente usando:
 
 ```
-
 $ kill -3 <PID>
-
-
-
-
 ```
 
 Si observamos la ventana de terminal o el archivo de registro donde se está escribiendo la salida del servidor, veremos la información de los varios subprocesos que se están ejecutando y los trazados detallados de la pila en la línea de código que están ejecutando.
@@ -362,13 +341,7 @@ Si observamos la ventana de terminal o el archivo de registro donde se está esc
 También podemos ver un volcado de las estadísticas de caché/memoria usando:
 
 ```
-
 $ kill -USR1 <PID>
-
-
-
-
-
 ```
 
 ## Resumen
@@ -378,3 +351,5 @@ Las pruebas automatizadas son una práctica valiosa, tanto para las aplicaciones
 Aprendimos los principios básicos de cómo agregar y ejecutar pruebas para un módulo addon. También discutimos algunas técnicas para ayudarnos a depurar nuestro código.
 
 En el próximo capítulo, profundizaremos en la capa de vistas, y discutiremos las vistas kanban.
+
+---
