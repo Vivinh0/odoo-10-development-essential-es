@@ -36,7 +36,6 @@ Con respecto a la imagen de Linux a utilizar, será más amigable para el usuari
 
 Una vez instalada y arrancada, deberías ser capaz de iniciar sesión en una línea de comando shell.
 
-
 ## Creando una cuenta de usuario para Oddo
 
 Si has iniciado sesión usando la cuenta de super usuario `root`, tu primera tarea debe ser crear una cuenta de usuario normal para tu trabajo, ya que se considera una mala práctica trabajar como `root`. En particular, el operador de Odoo se rehusará a correr si lo inicias como `root`.
@@ -48,23 +47,17 @@ Primero, asegurate de que `sudo` esté instalado. Nuestro usuario de trabajo lo 
 ```
 # apt-get update && apt-get upgrade  # Install system updates
 # apt-get install sudo  # Make sure 'sudo' is installed
-
 ```
-
 
 El siguiente set de comandos creará un usuario `odoo`:
 
 ```
 # useradd -m -g sudo -s /bin/bash odoo  # Create an 'odoo' user with sudo powers
-
 # passwd odoo  # Ask and set a password for the new user
-
 ```
 Puedes cambiar el nombre de usuario  `odoo` al que tu quieras. La opción `-m`asegura que su directorio de inicio sea creado. La opción `-g sudo` 
 
-
 Ahora podemos iniciar sesión como el nuevo usuario y organizar Odoo.
-
 
 ## Instalando Odoo desde la fuente
 
@@ -112,7 +105,7 @@ $ sudo npm install -g less less-plugin-clean-css  #Install less compiler
 
 ```
 
- Partiendo de la versión 9.0, el cliente web de Odoo requiere que el preprocesador `less` CSS esté instalado en el sistema para que las páginas web puedan ser renderizadas correctamente. Para instalar esto, necesitamos Node.js y npm.
+Partiendo de la versión 9.0, el cliente web de Odoo requiere que el preprocesador `less` CSS esté instalado en el sistema para que las páginas web puedan ser renderizadas correctamente. Para instalar esto, necesitamos Node.js y npm.
 
 Luego, necesitamos obtener el código fuente Odoo e instalar sus dependencias. El código fuente Odoo incluye un script de utilidades, dentro del directorio `odoo/setup/`, para ayudarnos a instalar las dependencias requeridas en un sistema Debian/Ubuntu:
  
@@ -143,7 +136,7 @@ En Odoo 10, el script `odoo.py`, utilizado en versiones previas para iniciar el 
 
 De forma predeterminada, las instancias Odoo escuchan en el puerto 8069, por lo que si apuntamos un navegador a `http: // <dirección-servidor>: 8069`, llegaremos a estas instancias. Cuando lo accedemos por primera vez, nos muestra un asistente para crear una nueva base de datos, como se muestra en la siguiente captura de pantalla:
 
-![Database](file:img/1-01.jpg)
+![Database](./img/1-01.jpg)
 
 Como desarrolladores, necesitaremos trabajar con varias bases de datos, así que es más convenientes más conveniente crearlos desde la línea de comandos, así que aprenderemos cómo hacerlo. Ahora presione ***Ctrl + C*** en el terminal para detener el servidor Odoo y volver al prompt de comando.
 
@@ -154,6 +147,7 @@ Para ser capaces de crear una nueva database, tu usuario debe ser un super usuar
 ```
 $ sudo createuser --superuser $(whoami)
 ```
+
 Para crear una nueva database, usa el comando `createdb`. Creeamos una database `demo`:
 
 ```
@@ -169,6 +163,7 @@ $ ~/odoo-dev/odoo/odoo-bin -d demo
 Esto tomará un par de minutos para inicializar una database `demo`, y terminará con un mensaje de registro INFO, **Módulos cargados**.
 
 ### Nota
+
 Ten en cuenta que puede no ser el último mensaje de registro, y puede estar en las últimas tres o cuatro líneas. Con esto, el servidor estará listo para escuchar las peticiones del cliente.
 
 De forma predeterminada, esto inicializará la database con datos de demostración, que a menudo es útil para las databases de desarrollo. Para inicializar una database sin datos de demostración, agregue la opción `--without-demo-data = all` al comando.
@@ -179,7 +174,7 @@ Si estás hospedando Odoo en una máquina virtual, es posible que debas establec
 
 La cuenta de administrador predeterminada es `admin` con su contraseña `admin`. Al iniciar sesión, se le presenta el menú  **Apps**, que muestra las aplicaciones disponibles:
 
-![Database](file:img/1-02.jpg)
+![Database](./img/1-02.jpg)
 
 Siempre que desee detener la instancia del servidor Odoo y volver a la línea de comandos, presione ***Ctrl + C*** en el indicador de bash. Al presionar la tecla de flecha hacia arriba le llevará el comando de shell anterior, por lo que es una forma rápida de iniciar Odoo de nuevo con las mismas opciones. Las teclas ***Ctrl + C*** seguido por la tecla de flecha hacia arriba y ***Enter*** son una combinación utilizada con frecuencia para reiniciar el servidor Odoo durante el desarrollo.
 
@@ -194,6 +189,7 @@ Asegúrate de que tu instancia de Odoo está detenida y no tiene ninguna otra co
 ```
 $ Createdb --template = demo demo-test
 ```
+
 De hecho, cada vez que creamos una base de datos, se utiliza una plantilla. Si no se especifica ninguna, se utiliza una predeterminada llamada `template1`.
 
 Para enumerar las bases de datos existentes en su sistema, utiliza la utilidad `psq`l de PostgreSQL con la opción `-l`:
@@ -223,6 +219,7 @@ El comando drop de la base de datos  destruirá irrevocablemente tus datos. Ten 
 Al momento de la redacción de este texto, la última versión estable de Odoo es la versión 10, marcada en GitHub como rama 10.0. Esta es la versión con la que trabajaremos a lo largo del libro.
 
 ### Nota
+
 Es importante notar que las bases de datos de Odoo son incompatibles entre las versiones principales de Odoo. Esto significa que si ejecutas un servidor Odoo 10 contra una base de datos creada para una versión principal anterior de Odoo, no funcionará.
 
 El trabajo de migración no trivial es necesario antes de que una base de datos pueda ser usada con una versión más reciente del producto.
@@ -318,13 +315,14 @@ De forma predeterminada, la salida del registro se dirige a la salida estándar 
 
 Finalmente, la opción `--dev=all` mostrará el depurador de Python (`pdb`) cuando se genera una excepción. Es útil hacer un análisis post-mortem de un error de servidor. Ten en cuenta que no tiene ningún efecto en la verbosidad del registrador. Puedes encontrar más detalles sobre los comandos del depurador de Python en https://docs.python.org/2/library/pdb.html#debugger-commands.
 
-
 ### Desarrollando desde tu estación de trabajo
+
 Puedes estar ejecutando Odoo con un sistema Debian / Ubuntu en una máquina virtual local o en un servidor a través de la red. Pero puede que prefieras hacer el trabajo de desarrollo en tu estación de trabajo personal, utilizando tu editor de texto favorito o IDE. Este suele ser el caso de los desarrolladores que trabajan desde estaciones de trabajo Windows. Pero también puede ser el caso de los usuarios de Linux que necesitan trabajar en un servidor Odoo a través de la red local.
 
 Una solución para esto es para permitir el uso compartido de archivos en el huesped Odoo para que los archivos sean fáciles de editar desde nuestra estación de trabajo. Para las operaciones del servidor Odoo, como un reinicio del servidor, podemos usar un shell SSH (como PuTTY en Windows) junto con nuestro editor favorito.
 
 ####  Usando un editor de texto Linux
+
 Tarde o temprano, necesitaremos editar archivos desde la línea de comandos del shell. En muchos sistemas Debian, el editor de texto predeterminado es vi. Si no te sientes cómodo con él, probablemente podrías usar una alternativa más amigable. En los sistemas Ubuntu, el editor de texto predeterminado es nano. Es posible que prefieras este, ya que es más fácil de usar. En caso de que no esté disponible en tu servidor, se puede instalar con:
 
 ```
@@ -334,35 +332,23 @@ $ sudo apt-get install nano
 En las siguientes secciones, asumiremos nano como el editor preferido. Si prefieres cualquier otro editor, siéntete libre de adaptar los comandos en consecuencia.
 
 ## Instalando y configurando Samba
+
 El servicio Samba ayuda a que los servicios de compartición de archivos de Linux sean compatibles con los sistemas Microsoft Windows. Podemos instalarlo en nuestro servidor Debian / Ubuntu con este comando:
 
-
 ```
-
 $ Sudo apt-get instalar samba samba-common-bin
-
 ```
-
-
 
 El paquete `samba` instala los servicios de intercambio de archivos y el paquete `samba-common-bin` es necesario para la herramienta `smbpasswd`. De forma predeterminada, los usuarios autorizados a acceder a archivos compartidos deben registrarse con él. Necesitamos registrar a nuestro usuario, `odoo` por ejemplo, y establecer una contraseña para su acceso a compartir archivos:
+
 ```
-
-
 $ Sudo smbpasswd -a odoo
 ```
-
-
-
-
 
 Después de esto, se nos pedirá una contraseña para usar para acceder al directorio compartido, y el usuario `odoo` podrá acceder a los archivos compartidos para su directorio personal, aunque será de sólo lectura. Queremos tener acceso de escritura, por lo que necesitamos editar el archivo de configuración de Samba para cambiarlo de la siguiente manera:
 
 ```
-
-
 $ Sudo nano /etc/samba/smb.conf
-
 ```
 
 En el archivo de configuración, busque la sección `[homes]`. Edita sus líneas de configuración para que coincidan con la configuración de la siguiente manera:
@@ -381,7 +367,9 @@ Para que los cambios de configuración tengan efecto, reinicia el servicio:
 ```
 $ sudo /etc/init.d/smbd restart
 ```
+
 #### Tip
+
 ##### Descargando el código ejemplo
 
 Puedes descargar los archivos de códigos de ejemplo para todos los libros Packt que hayas comprado desde tu cuenta en http://www.packtpub.com. Si compraste este libro en algun otro sitio, puedes entrar a http://www.packtpub.com/support y registrate para que te envien los archivos directamente por correo electrónico.
@@ -389,33 +377,36 @@ Puedes descargar los archivos de códigos de ejemplo para todos los libros Packt
 Para acceder a los archivos desde Windows, podemos asignar una unidad de red para la ruta `\\ <my-server-name>\odoo`
 utilizando el nombre de usuario y la contraseña específicos definidos con `smbpasswd` Al intentar iniciar sesión con el usuario `odoo`, podría encontrar problemas con Windows agregando el dominio del equipo al nombre de usuario (por ejemplo, `MYPC \ odoo`). Para evitar esto, utilice un dominio vacío añadiendo un caracter`\` al inicio de sesión (por ejemplo, `\ odoo`):
 
-![Directory](file:img/1-03.jpg)
-
+![Directory](./img/1-03.jpg)
 
 Si ahora abrimos la unidad asignada con el Explorador de Windows, podremos acceder y editar el contenido del directorio home del usuario `odoo`:
 
-![Home](file:img/1-04.jpg)
+![Home](./img/1-04.jpg)
 
 Odoo incluye un par de herramientas que son muy útiles para los desarrolladores, y vamos a hacer uso de ellAs a lo largo del libro. Son características técnicas y el modo de desarrollo. Estos están desactivados por defecto, por lo que este es un buen momento para aprender a habilitarlos.
 
 ### Activación de las herramientas de desarrollo
+
 Las herramientas de desarrollo proporcionan una configuración y funciones avanzadas de servidor. Estos incluyen un menú de depuración en la barra de menú superior junto con opciones de menú adicionales en el menú **Settings**, en particular el menú **Technical**.
 
 Estas herramientas vienen deshabilitadas de forma predeterminada y, para habilitarlas, debemos iniciar sesión como administrador. En la barra de menú superior, seleccione el menú **Settings**. En la parte inferior derecha, debajo de la versión Odoo, encontrará dos opciones para habilitar el modo de desarrollo; cualquiera de ellas habilitará los menús **Debug** y **Technical**. La segunda opción, **Activate the developer mode (whit assest)**, también deshabilita la minificación de JavaScript y CSS utilizada por el cliente web, facilitando la depuración del comportamiento del cliente:
 
-![Depuracion](file:img/1-05.jpg)
+![Depuracion](./img/1-05.jpg)
 
 Después de eso, la página se vuelve a cargar y debería verse un icono de error en la barra de menú superior, justo antes del avatar y nombre de usuario de la sesión que proporciona las opciones de modo de depuración. Y en la opción **Settings** en el menú superior, deberíamos ver una nueva sección del menú **Technical** que da acceso a muchos internos de la instancia de Odoo:
 
-![Cliente](file:img/1-06.jpg)
+![Cliente](./img/1-06.jpg)
 
 #### Tip
+
 La opción **Technical** del menú nos permite inspeccionar y editar todas las configuraciones Odoo almacenadas en la base de datos, desde la interfaz de usuario hasta la seguridad y otros parámetros del sistema. Aprenderás más sobre muchos de estos a lo largo del libro.
 
 ##  Instalación de módulos de terceros
+
 Hacer nuevos módulos disponibles en una instancia Odoo para que puedan instalarse es algo que los recién llegados a Odoo suelen encontrar confuso. Pero no tiene que ser así, así que vamos a desmitificarlo.
 
 ## Encontrar módulos comunitarios
+
 Hay muchos módulos Odoo disponibles en Internet. La tienda de aplicaciones de Odoo en apps.odoo.com es un catálogo de módulos que se pueden descargar e instalar en su sistema. La **Odoo Community Association (OCA)** coordina las contribuciones de la comunidad y mantiene bastantes repositorios de módulos en GitHub en https://github.com/OCA/.
 
 Para agregar un módulo a una instalación de Odoo, podríamos copiarlo en el directorio `addons` junto con los módulos oficiales. En nuestro caso, el directorio `addons` está en `~ / odoo-dev / odoo / addons /`. Esto podría no ser la mejor opción para nosotros, ya que nuestra instalación de Odoo se basa en un repositorio de código controlado por versiones, y queremos mantenerlo sincronizado con el repositorio de GitHub.
@@ -431,16 +422,19 @@ $ cd ~/odoo-dev
 
 $ git clone https://github.com/dreispt/todo_app.git -b 10.0
 ```
+
 Usamos la opción `-b` para asegurarnos de que estamos escargando los módulos para la versión 10.0.
 
 Después de esto, tendremos un directorio nuevo `/ todo_app` junto al directorio `/ odoo`, que contiene los módulos. Ahora debemos informar a Odoo sobre este nuevo directorio de módulos.
 
 ### Configurandola ruta addons
+
 El servidor Odoo tiene una opción de configuración llamada `addons_path` para establecer dónde el servidor debe buscar módulos. De forma predeterminada, esto apunta al directorio `/ addons`, donde se ejecuta el servidor Odoo.
 
 Podemos proporcionar no sólo una, sino una lista de directorios donde se pueden encontrar módulos. Esto nos permite mantener nuestros módulos personalizados en un directorio diferente, sin tenerlos mezclados con los addons oficiales.
 
 Vamos a iniciar el servidor con una ruta addons que incluye nuestro nuevo directorio de módulos:
+
 ```
 $ cd ~/odoo-dev/odoo
 
@@ -450,6 +444,7 @@ $ ./odoo-bin -d demo --addons-path="../todo_app,./addons"
 Si miras más de cerca el registro del servidor, notarás una línea que informa de la ruta de complementos en uso: `INFO? Odoo: addons paths: [...]`. Confirma que contiene nuestro directorio `todo_app`.
 
 ### Actualizando la lista de aplicaciones
+
 Todavía necesitamos pedirle a Odoo que actualice su lista de módulos antes de que estos nuevos módulos estén disponibles para la instalación.
 
 Para ello, necesitamos activar el modo desarrollador, ya que proporciona la opción de menú **Actualizar Lista de Aplicaciones**. Se puede encontrar en el menú superior de **Aplicaciones**.
@@ -458,9 +453,10 @@ Después de actualizar la lista de módulos, podemos confirmar que los nuevos m�
 
 Ten en cuenta que la segunda opción de menú **App Store** muestra la lista de módulos del almacén de aplicaciones Odoo en lugar de los módulos locales:
 
-![Apps](file:img/1-07.jpg)
+![Apps](./img/1-07.jpg)
 
 ## Resumen
+
 En este capítulo, aprendimos a configurar un sistema Debian para alojar Odoo e instalarlo desde el código fuente de GitHub. También aprendimos a crear bases de datos Odoo y ejecutar instancias de Odoo. Para permitir a los desarrolladores utilizar sus herramientas favoritas en su estación de trabajo personal, explicamos cómo configurar el uso compartido de archivos en el huesped Odoo.
 
 Ahora deberíamos tener un ambiente Odoo en funcionamiento para trabajar y estar cómodos con la administración de bases de datos e instancias.
@@ -468,3 +464,5 @@ Ahora deberíamos tener un ambiente Odoo en funcionamiento para trabajar y estar
 Con esto en su lugar, estamos listos para ir directamente a la acción. En el próximo capítulo, crearemos nuestro primer módulo Odoo desde cero y entenderemos los principales elementos que involucra.
 
 ¡Entonces empecemos!
+
+---
