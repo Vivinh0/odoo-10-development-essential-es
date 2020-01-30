@@ -10,7 +10,7 @@ Cada componente de la interfaz de usuario se almacena en un registro de base de 
 Esto significa que un nuevo archivo de datos XML para nuestra interfaz de usuario debe agregarse al módulo `todo_ui`. Podemos comenzar editando el archivo `__manifest__.py` para declarar estos nuevos archivos de datos:
 
 ```py
- {
+{
     'name': 'User interface improvements to the To-Do app',
     'description': 'User friendly features.',
     'author': 'Daniel Reis',

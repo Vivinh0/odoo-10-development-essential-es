@@ -1,4 +1,5 @@
 # Capítulo 7. Lógica de aplicación de ORM - Procesos de soporte empresariales.
+
 Con la programación API de Odoo, podemos escribir lógica compleja y asistentes para proporcionar una interacción de usuario rica para nuestras aplicaciones. En este capítulo, veremos cómo escribir código para apoyar la lógica de negocio en nuestros modelos, y también aprenderemos cómo activarlo en eventos y acciones de usuario.
 
 Podemos realizar cálculos y validaciones en eventos, como crear o escribir en un registro, o realizar alguna lógica cuando se hace clic en un botón. Por ejemplo, hemos implementado acciones de botón para las Tareas pendientes, para alternar el indicador **Listo "Is Done"** y desactivar todas las tareas realizadas desactivándolas. 
@@ -15,13 +16,13 @@ Los asistentes son formularios utilizados para obtener información de entrada d
 
 Así será nuestro asistente:
 
-![ToDoTaskCreatingWizard](file:img/7-01.jpg)
+![ToDoTaskCreatingWizard](./img/7-01.jpg)
 
 Podemos empezar creando un nuevo módulo addon para la función `todo_wizard`.
 
 Nuestro módulo tendrá un archivo Python y un archivo XML, por lo que la descripción de `todo_wizard/__ manifest__.py` será como se muestra en el siguiente código:
 
-```
+```py
 {  'name': 'To-do Tasks Management Assistant', 
    'description': 'Mass edit your To-Do backlog.', 
    'author': 'Daniel Reis', 
@@ -31,7 +32,7 @@ Nuestro módulo tendrá un archivo Python y un archivo XML, por lo que la descri
 
 Como en los complementos anteriores, el archivo `todo_wizard/__ init__.py` es sólo una línea:
 
-```
+```py
 from . import models
 ```
 
@@ -49,14 +50,13 @@ El archivo `models/todo_wizard_model.py` definirá los campos que necesitamos pa
 
 Primero agregua el archivo`models/__init__.py` con la siguiente línea de código:
 
-```
+```py
 from . import todo_wizard_model 
-
 ```
 
 Luego, crea el archivo actual `models/todo_wizard_model.py`:
 
-```
+```py
 # -*- coding: utf-8 -*- 
 from odoo import models, fields, api 
  
@@ -68,7 +68,6 @@ class TodoWizard(models.TransientModel):
     new_deadline = fields.Date('Deadline to Set') 
     new_user_id = fields.Many2one( 
       'res.users',string='Responsible to Set') 
-      
 ```
 
 Vale la pena señalar que las relaciones uno-a-muchos con los modelos regulares no deben usarse en modelos transitorios. La razón de esto es que requeriría que el modelo regular tuviera la relación inversa de muchos a uno con el modelo transitorio, pero esto no está permitido, ya que podría haber la necesidad de recolectar basura a los registros de modelos regulares junto con el modelo Registros transitorios.
@@ -82,14 +81,15 @@ Las vistas del formulario del asistente son las mismas que para los modelos regu
 
 Este es el contenido de nuestro archivo `views/todo_wizard_view.xml`:
 
-```
+```xml
 <odoo> 
   <record id="To-do Task Wizard" model="ir.ui.view"> 
     <field name="name">To-do Task Wizard</field> 
     <field name="model">todo.wizard</field> 
     <field name="arch" type="xml"> 
  
-      <form> 
+      <form>
+
         <div class="oe_right"> 
           <button type="object" name="do_count_tasks" 
             string="Count" /> 
@@ -118,8 +118,10 @@ Este es el contenido de nuestro archivo `views/todo_wizard_view.xml`:
             ('new_user_id', '=',False)] 
             }" /> 
           <button special="cancel" string="Cancel"/> 
-        </footer> 
-      </form> 
+        </footer>
+
+      </form>
+
     </field> 
   </record> 
  
@@ -129,8 +131,8 @@ Este es el contenido de nuestro archivo `views/todo_wizard_view.xml`:
     src_model="todo.task" res_model="todo.wizard" 
     view_mode="form" target="new" multi="True" /> 
 </odoo> 
-
 ```
+
 La acción de ventana `<act_window>` que vemos en el XML añade una opción al botón **Más "More"** del formulario Tarea pendiente mediante el atributo `src_model`. El atributo `target="new"` lo hace abrir como una ventana de diálogo.
 
 También puedes haber notado que `attrs` se utiliza en el botón de **actualización masiva "Mass Update"**, para añadir el toque agradable de hacerlo invisible hasta que se seleccione un nuevo plazo o un usuario responsable.
@@ -141,7 +143,7 @@ A continuación, tenemos que implementar las acciones a realizar en los botones 
 
 El método llamado por el botón es `do_mass_update` y debe definirse en el archivo `models/todo_wizard_model.py`, como se muestra en el código siguiente:
 
-```
+```py
 from odoo import exceptions 
 import logging 
 _logger = logging.getLogger(__name__) 
@@ -203,7 +205,7 @@ Una cosa interesante a notar sobre el registro, es que las entradas del registro
 
 Cuando algo no está bien, querremos interrumpir el programa con un mensaje de error. Esto se hace levantando una excepción. Odoo ofrece algunas clases de excepción adicionales a las disponibles en Python. Estos son ejemplos para los más útiles:
 
-```
+```py
 from odoo import exceptions 
 raise exceptions.Warning('Warning message') 
 raise exceptions.ValidationError('Not valid message')
@@ -211,7 +213,7 @@ raise exceptions.ValidationError('Not valid message')
 
 El mensaje de advertencia `Warning` también interrumpe la ejecución, pero puede sonar menos grave que un mensaje `ValidationError`. Aunque no es la mejor interfaz de usuario, aprovechamos eso en el botón de conteo **Count** para mostrar un mensaje al usuario:
 
-```
+```py
 @api.multi 
 def do_count_tasks(self): 
     Task = self.env['todo.task'] 
@@ -232,7 +234,7 @@ Afortunadamente, podemos evitar este comportamiento pidiendo al cliente que vuel
 
 Vamos a definir una función de ayuda para el diccionario de acción de la ventana para reabrir la ventana del asistente, para que pueda reutilizarse fácilmente en varios botones:
 
-```
+```py
 @api.multi 
 def _reopen_form(self): 
     self.ensure_one() 
@@ -249,7 +251,7 @@ Vale la pena señalar que la acción de la ventana podría ser algo más, como s
 
 Ahora, el botón **Get All** puede hacer su trabajo y mantener al usuario trabajando en el mismo asistente:
 
-```
+```py
 @api.multi 
 def do_populate_tasks(self): 
     self.ensure_one()         
@@ -289,7 +291,7 @@ Algunos otros decoradores tienen propósitos más específicos y se van a utiliz
 
 En particular, los métodos `onchange` pueden enviar un mensaje de advertencia a la interfaz de usuario. Por ejemplo, esto podría advertir al usuario que la cantidad de producto recién ingresada no está disponible en stock, sin impedir que el usuario continúe. Esto se hace al hacer que el método devuelva un diccionario que describe el mensaje de advertencia:
 
-```
+```py
 return { 
          'warning': { 
          'title': 'Warning!', 
@@ -305,7 +307,7 @@ El caso más común es extender los métodos `create()` y `write()`. Esto se pue
 
 Utilizando el modelo `TodoTask` como ejemplo, podemos hacer un `create()` personalizado, que se vería así:
 
-```
+```py
 @api.model 
 def create(self, vals): 
     # Code before create: can use the `vals` dict 
@@ -317,7 +319,7 @@ def create(self, vals):
 
 Un `write()` personalizado debería seguir esta estructura:
 
-```
+```py
 @api.multi 
 def write(self, vals): 
     # Code before write: can use `self`, with the old values 
@@ -359,50 +361,23 @@ Python tiene una interfaz de línea de comandos que es una gran manera de explor
 
 Para usarlo, ejecuta Odoo con el comando `shell` y la base de datos para usar, como se muestra aquí:
 
-
 ```
 $ ./odoo-bin shell -d todo
-
 ```
 
 
 Deberías ver la habitual secuencia de inicio del servidor en el terminal hasta que pare en un prompt Python `>>>` esperando tu entrada. Aquí, `self` representará el registro para el usuario `Administratoṛ`, el que puedes confirmar escribiendo lo siguiente:
 
-
 ```
-
 >>> self
-
-
-
-
-
 res.users(1,)
 
-
-
-
-
 >>> self._name
-
-
-
-
-
 'res.users'
-
-
-
-
 
 >>> self.name
 
-
-
-
-
 u'Administrator'
-
 ```
 
 En la sesión anterior, hacemos una cierta inspección sobre nuestro medio ambiente. El `self` representa un conjunto de registros `res.users` que contiene sólo el registro con el ID `1`. También podemos confirmar el nombre de modelo del conjunto de registros que inspecciona `self._name` y obtener el valor del campo de registro `name`, confirmando que es el usuario `Administrator`.
@@ -421,15 +396,8 @@ Como hemos visto, `self`es un conjunto de registros. Los **Conjuntos de Registro
 
 Podemos comenzar a inspeccionar nuestro entorno actual con:
 
-
 ```
-
 >>> self.env
-
-
-
-
-
 <openerp.api.Environment object at 0xb3f4f52c>
 ```
 
@@ -443,20 +411,11 @@ El entorno de ejecución en `self.env` tiene los siguientes atributos disponible
 El entorno también proporciona acceso al registro donde están disponibles todos los modelos instalados. Por ejemplo, `self.env['res.partner']` devuelve una referencia al modelo Socios. Podemos usar `search()` o `browse()` para recuperar los conjuntos de registros:
 
 ```
-
 >>> self.env['res.partner'].search([('name', 'like', 'Ag')])
-
-
-
-
-
 res.partner(7, 51)
-
-
 ```
 
 En este ejemplo, un conjunto de registros para el modelo `res.partner` contiene dos registros, con IDs `7` y `51`.
-
 
 ### Modificando del entorno de ejecución
 
@@ -471,17 +430,8 @@ Estos métodos se pueden utilizar para eso:
 Además, tenemos la función `env.ref()`, tomando una cadena con un identificador externo y devuelve un registro para ella, como se muestra aquí:
 
 ```
-
 >>> self.env.ref('base.user_root')
-
-
-
-
-
 res.users(1,)
-
-
-
 ```
 
 ### Transacciones y SQL de bajo nivel
@@ -508,30 +458,13 @@ Con `cr.execute()` debemos resistir a añadir directamente los valores de los pa
 
 Si está utilizando una consulta `SELECT`, los registros se deben buscar. La función `fetchall()` recupera todas las filas como una lista de tuplas, y `dictfetchall()` las recupera como una lista de diccionarios, como se muestra en el siguiente ejemplo:
 
-
 ```
-
 >>> self.env.cr.execute("SELECT id, login FROM res_users WHERE 
-
-
-
-
-
 login=%s OR id=%s", ('demo', 1))
 
-
-
-
-
 >>> self.env.cr.fetchall() 
-
-
-
-
-
 [(4, u'demo'), (1, u'admin')]
-
-
+```
 
 También es posible ejecutar instrucciones de **Data Manipulation Language (DML)** como `UPDATE` e `INSERT`. Dado que el servidor mantiene cachés de datos, pueden volverse inconsistentes con los datos reales de la base de datos. Debido a esto, mientras se utiliza DML sin procesar, las caches se deben borrar después usando `self.env.invalidate_all()`.
 
@@ -544,7 +477,6 @@ Ejecutar SQL directamente en la base de datos puede dar lugar a datos inconsiste
 ## Trabajando con conjuntos de registros
 
 Ahora exploraremos cómo funciona el ORM y nos enteramos de las operaciones más comunes que se realizan con ella. Usaremos el prompt proporcionado por el comando `shell` para explorar interactivamente cómo funcionan los recordsets.
-
 
 ### Consultando modelos
 
@@ -564,32 +496,12 @@ El método `browse()` toma una lista de IDs o una sola ID y devuelve un conjunto
 
 Algunos ejemplos de uso de esto se muestran aquí:
 
-
 ```
-
 >>> self.env['res.partner'].search([('name', 'like', 'Ag')])
-
-
-
-
-
 res.partner(7, 51)
-
-
-
-
 
 >>> self.env['res.partner'].browse([7, 51])
-
-
-
-
-
-
 res.partner(7, 51)
-
-
-
 ```
 
 ### Singletons
@@ -603,7 +515,6 @@ Pero a diferencia de los conjuntos de registros de elementos múltiples, los sin
 Administrator
 ```
 
-
 En el siguiente ejemplo, podemos ver que el mismo conjunto de registros `self` singleton también se comporta como un conjunto de registros, y podemos iterarlo. Tiene sólo un registro, por lo que solo se imprime un nombre:
 
 ```
@@ -614,7 +525,6 @@ Administrator
 
 Intentar acceder a valores de campo en conjuntos de registros con más de un registro generará error, por lo que este puede ser un problema en los casos en los que no estamos seguros si estamos trabajando con un conjunto de registros singleton. En los métodos diseñados para trabajar sólo con singleton, podemos comprobar esto usando `self.ensure_one()` al principio. Se planteará un error si `self` no es singleton.
 
-
 #### Tip
 
 Ten en cuenta que un registro vacío también es un singleton.
@@ -624,40 +534,15 @@ Ten en cuenta que un registro vacío también es un singleton.
 Los conjuntos de registros implementan el patrón de registro activo. Esto significa que podemos asignar valores a ellos, y estos cambios se harán persistentes en la base de datos. Esta es una manera intuitiva y conveniente de manipular datos, como se muestra aquí:
 
 ```
-
 >>> admin = self.env['res.users'].browse(1)
 
-
-
-
-
 >>> print admin.name
-
-
-
-
-
 Administrator
-
-
-
-
 
 >>> admin.name = 'Superuser'
 
-
-
-
-
 >>> print admin.name
-
-
-
-
-
 Superuser
-
-
 ```
 
 Los conjuntos de registros también tienen tres métodos para actuar en sus datos: `create()`, `write()` y `unlink()`.
@@ -665,48 +550,21 @@ Los conjuntos de registros también tienen tres métodos para actuar en sus dato
 El método `create()` toma un diccionario para asignar los campos a los valores y devuelve el registro creado. Los valores predeterminados se aplican automáticamente como se espera, lo que se muestra aquí:
 
 ```
-
 >>> Partner = self.env['res.partner']
-
-
-
-
 
 >>> new = Partner.create({'name': 'ACME', 'is_company': True})
 
-
-
-
-
 >>> print new
-
-
-
-
-
 res.partner(72,)
-
-
 ```
 
 El método `unlink()` borra los registros en los conjuntos de registros, como se muestra aquí:
 
 ```
-
 >>> rec = Partner.search([('name', '=', 'ACME')])
 
-
-
-
-
 >>> rec.unlink()
-
-
-
-
-
 True
-
 ```
 
 El método `write()` toma un diccionario para asignar campos a valores. Éstos se actualizan en todos los elementos del conjunto de registros y no se devuelve nada, como se muestra aquí:
@@ -720,21 +578,14 @@ El uso del patrón de registro activo tiene algunas limitaciones; Actualiza sól
 También vale la pena mencionar `copy()` para duplicar un registro existente; Toma eso como un argumento opcional y un diccionario con los valores para escribir en el nuevo registro. Por ejemplo, para crear una nueva copia de usuario desde el usuario de demostración:
 
 ```
-
 >>> demo = self.env.ref('base.user_demo')
 
-
-
-
-
 >>> new = demo.copy({'name': 'Daniel', 'login': 'dr', 'email':''})
-
 ```
 
 #### Nota
 
 Recuerda que los campos con el atributo `copy=False` no se copiarán.
-
 
 ### Trabajando con el tiempo y las fechas
 
@@ -748,33 +599,13 @@ Corresponden a `%Y-%m-%d and %Y-%m-%d %H:%M:%S` respectivamente.
 Para ayudar a manejar fechas, `fields.Date` y `fields.Datetime` proporcionan pocas funciones. Por ejemplo:
 
 ```
-
 >>> from odoo import fields
 
-
-
-
-
 >>> fields.Datetime.now()
-
-
-
-
-
 '2014-12-08 23:36:09'
 
-
-
-
-
 >>> fields.Datetime.from_string('2014-12-08 23:36:09')
-
-
-
-
-
 datetime.datetime(2014, 12, 8, 23, 36, 9)
-
 ```
 
 Las fechas y horas son manejadas y almacenadas por el servidor en un formato UTC, que no es consciente de la zona horaria y puede ser diferente de la zona horaria en la que el usuario está trabajando. Debido a esto, podemos hacer uso de algunas otras funciones para ayudarnos a lidiar con esto:
@@ -807,99 +638,31 @@ También están disponibles las siguientes operaciones:
 Estos son algunos ejemplos de uso para estas funciones:
 
 ```
-
 >>> rs0 = self.env['res.partner'].search([])
 
-
-
-
-
 >>> len(rs0)  # how many records?
-
-
-
-
-
 40
-
-
-
-
 
 >>> starts_A = lambda r: r.name.startswith('A')
 
-
-
-
-
 >>> rs1 = rs0.filtered(starts_A)
 
-
-
-
-
 >>> print rs1
-
-
-
-
-
 res.partner(8, 7, 19, 30, 3)
-
-
-
-
 
 >>> rs2 = rs1.filtered('is_company')
 
-
-
-
-
 >>> print rs2
-
-
-
-
-
 res.partner(8, 7)
-
-
-
-
 
 >>> rs2.mapped('name')
-
-
-
-
-
 [u'Agrolait', u'ASUSTeK']
 
-
-
-
-
 >>> rs2.mapped(lambda r: (r.id, r.name))
-
-
-
-
-
 [(8, u'Agrolait'), (7, u'ASUSTeK')]
 
-
-
-
-
->> rs2.sorted(key=lambda r: r.id, reverse=True)
-
-
-
-
-
+>>> rs2.sorted(key=lambda r: r.id, reverse=True)
 res.partner(8, 7)
-
 ```
 
 ### Manipulando conjuntos de registros
@@ -945,78 +708,27 @@ Como vimos anteriormente, los modelos pueden tener campos relacionales: **muchos
 En el caso de muchos-a-uno, el valor puede ser un singleton o un conjunto de registros vacío. En ambos casos, podemos acceder directamente a sus valores de campo. Por ejemplo, las siguientes instrucciones son correctas y seguras:
 
 ```
-
 >>> self.company_id
-
-
-
-
-
 res.company(1,)
 
-
-
-
-
 >>> self.company_id.name
-
-
-
-
-
 u'YourCompany'
 
-
-
-
-
 >>> self.company_id.currency_id
-
-
-
-
-
 res.currency(1,)
 
-
-
-
-
-
 >>> self.company_id.currency_id.name
-
-
-
-
-
 u'EUR'
-
 ```
 
 Convenientemente, un conjunto de registros vacío también se comporta como singleton, y el acceso a sus campos no devuelve un error, pero simplemente devuelve `False`. Debido a esto, podemos recorrer registros usando la notación de puntos sin preocuparnos por errores de valores vacíos, como se muestra aquí:
 
 ```
-
 >>> self.company_id.country_id
-
-
-
-
-
 res.country()
 
-
-
-
-
 >>> self.company_id.country_id.name
-
-
-
-
-
 False
-
 ```
 
 ### Trabajando con campos relacionales
@@ -1038,3 +750,5 @@ En los capítulos anteriores, vimos cómo construir modelos y diseñar vistas. A
 También vimos cómo la lógica de negocio puede interactuar con la interfaz de usuario y aprendido a crear asistentes que se comunican con el usuario y servir como una plataforma para lanzar procesos avanzados.
 
 En el próximo capítulo, aprenderemos sobre la adición de pruebas automatizadas para nuestro módulo addon, y algunas técnicas de depuración.
+
+---
