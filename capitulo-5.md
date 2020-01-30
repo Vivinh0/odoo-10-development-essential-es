@@ -34,31 +34,21 @@ Comenzaremos por crear el nuevo módulo `todo_ui` y añadiremos los modelos de T
 Hemos estado usando el directorio `~ / odoo-dev / custom-addons /` para alojar nuestros módulos. Debemos crear un nuevo directorio `todo_ui` dentro de él para los nuevos addons. Desde el shell, podríamos usar los siguientes comandos:
 
 ```
-
 $ cd ~/odoo-dev/custom-addons
-
-
-
-
-
 $ mkdir todo_ui
-
-
-
-
-
 $ cd todo_ui
 ```
 
 Comenzamos añadiendo el archivo manifiesto `__manifest__.py`, con este contenido:
 
-```
+```py
 {
   'name': 'User interface improvements to the To-Do app',
   'description': 'User friendly features.',
   'author': 'Daniel Reis',
   'depends': ['todo_user'] }
 ```
+
 También debemos añadir un archivo` __init__.py`. Está perfectamente bien que esté vacío por ahora.
 
 Ahora podemos instalar el módulo en nuestra base de datos Odoo y comenzar con los modelos.
@@ -67,33 +57,35 @@ Ahora podemos instalar el módulo en nuestra base de datos Odoo y comenzar con l
 
 Para que las tareas pendientes tengan un tablero kanban, necesitamos Etapas. Las etapas son columnas del tablero, y cada tarea cabrá en una de estas columnas:
 
-
 1. Edita `todo_ui/__init__.py` para importar el submodulo `models`:
 
-```
+```py
 from . import models 
 ```
 
-1. Crea el directorio `todo_ui/models` y añádelo al archivo `an __init__.py` con esto:
-```
-        from . import todo_model 
-```
-1. Ahora, añadamoslo al archivo de código Pyton `todo_ui/models/todo_model.py`:
-```
-        # -*- coding: utf-8 -*-
-        from odoo import models, fields, api
+2. Crea el directorio `todo_ui/models` y añádelo al archivo `an __init__.py` con esto:
 
-        class Tag(models.Model):
-            _name = 'todo.task.tag'
-            _description = 'To-do Tag'
-            name = fields.Char('Name', 40, translate=True)
-        class Stage(models.Model):
-            _name = 'todo.task.stage'
-            _description = 'To-do Stage'
-            _order = 'sequence,name'
+```py
+from . import todo_model 
+```
 
-        name = fields.Char('Name', 40, translate=True)
-            sequence = fields.Integer('Sequence')
+3. Ahora, añadamoslo al archivo de código Pyton `todo_ui/models/todo_model.py`:
+
+```py
+# -*- coding: utf-8 -*-
+from odoo import models, fields, api
+
+class Tag(models.Model):
+    _name = 'todo.task.tag'
+    _description = 'To-do Tag'
+    name = fields.Char('Name', 40, translate=True)
+class Stage(models.Model):
+    _name = 'todo.task.stage'
+    _description = 'To-do Stage'
+    _order = 'sequence,name'
+
+name = fields.Char('Name', 40, translate=True)
+    sequence = fields.Integer('Sequence')
 ```
 
 Aquí hemos creado los dos nuevos modelos que serán referenciados en las tareas pendientes.
@@ -116,6 +108,7 @@ Para completar, hay un par de más atributos que se pueden utilizar en casos ava
 También podemos tener los atributos `_inherit` y `_inherits`, como se explicó en el capítulo 3, *Herencia - Extendiendo las aplicaciones existentes.
 
 ### Modelos y clases Python
+
 Los modelos Odoo están representados por clases Python. En el código anterior, tenemos una `Etapa` clase Python, basada en la clase `models.Model`, que define un nuevo modelo Odoo llamado `todo.task.stage`.
 
 Los modelos Odoo se mantienen en un registro central, también conocido como piscina en las versiones más antiguas de Odoo. Es un diccionario que mantiene referencias a todas las clases de modelo disponibles en la instancia, y puede ser referenciado por un nombre de modelo. Específicamente, el código de un método de modelo puede usar `self.env ['x']` para obtener una referencia a una clase que representa el modelo `x`.
@@ -140,9 +133,10 @@ Pero Odoo también proporciona otros dos tipos de modelos que se utilizarán: mo
 ### Inspeccionando los modelos existentes
 
 Los modelos y campos creados a través de las clases Python tienen su metadata disponíble a través de la interface de usuario. En el menú superior **Settings** navega al ítem de menú ** Technical | Database Structure | Models**.
+
 Aquí, hallarás la lista de todos los modelos disponíbles en la base de datos. Haciendo click en un modelo en la lista, abrirá una forma con estos detalles:
 
-![Modelo_de_lista](file:img/5-01.jpg)
+![Modelo_de_lista](./img/5-01.jpg)
 
 esta es una buena herramienta para inspeccionar la estructura de un modelo, ya que en un lugar, puedes ver los resultados de la personaliación de diferentes modulos. En este caso, tal como lo puedes ver en en la esquina superior derecha en el campo **In Apps**, las definiciones `todo.task`para este modelo provienen de ambos modulos `todo_app` y `todo_user`.
 
@@ -151,10 +145,12 @@ En el área inferior, tenemos algunas pestañas de información disponíbles: un
 Podemos hallar el **Identificador Externo** del modelo utilizando, desde el menú **Desarrollador**, la opción **Metadata View**. Los identificadores de modelo externo, o IDs XML, son generadas automáticamente por el ORM pero justamente predecible: para el modelo `todo.task`, el identificador externo es `model_todo_task`.
 
 ### Tip
+
 ¡El formulario **Modelos** es editable!. Es posible crear y modificar modelos, campos, y vistas desde aqui. Puedes utilizar este para construír prototipos antes de persistir en modulos.
 
 ## Creando campos
-Luego de crear un nuevo modelo, el próximo paso es añadir campos a éste. Odoo soporta todos los tipos de datos básicos que se esperan, tales como cadenas  de texto,   la base de datos, enteros, números de punto flotante, Booleanos, fechas,  
+
+Luego de crear un nuevo modelo, el próximo paso es añadir campos a éste. Odoo soporta todos los tipos de datos básicos que se esperan, tales como cadenas  de texto, la base de datos, enteros, números de punto flotante, Booleanos, fechas,  
 
 Algunos nombres de campo son especiales, se marchitan porque están reservados por el ORM para propósitos especiales, o porque algunas características incorporadas usan por defecto algunos nombres de campo predeterminados.
 
@@ -164,7 +160,7 @@ Vamos a explorar los diversos tipos de campos disponibles en Odoo.
 
 Ahora tenemos un modelo de `Etapa` y lo ampliaremos para agregar algunos campos adicionales. Debemos editar el archivo `todo_ui / models / todo_model.py` y añadir definiciones de campo adicionales para que se vea así:
 
-```
+```py
 class Stage(models.Model): 
     _name = 'todo.task.stage' 
     _description = 'To-do Stage' 
@@ -186,6 +182,7 @@ class Stage(models.Model):
     fold = fields.Boolean('Folded?') 
     image = fields.Binary('Image')
 ```
+
 Aquí, tenemos una muestra de los tipos de campo no relacional disponibles en Odoo con los argumentos posicionales esperados por cada uno.
 
 En la mayoría de los casos, el primer argumento es el título del campo, que corresponde al argumento del campo de la `string`; Se utiliza como texto predeterminado para las etiquetas de la interfaz de usuario. Es opcional, y si no se proporciona, un título se generará automáticamente a partir del nombre del campo.
@@ -224,7 +221,6 @@ Todos los atributos disponibles se pueden pasar como un argumento de palabra cla
 + `index=True` creará un índice de base de datos en el campo.
 + `copy=False` tiene el campo ignorado cuando se utiliza la función de registro duplicado, método ORM `copy ()`. Los campos no relacionales son `copyable` de forma predeterminada.
 + `groups` permite limitar el acceso y la visibilidad del campo a sólo algunos grupos. Espera una lista separada por comas de IDs XML para grupos de seguridad, como `groups='base.group_user, base.group_system'`.
-
 + `states` espera un diccionario que asigna valores para los atributos UI  que dependen de los valores del campo `satate`. Por ejemplo: `states = {'done': [('readonly', True)]}`. Los atributos que se pueden utilizar son `readonly`, `required` e `invisible`.
 
 #### Nota
@@ -261,8 +257,8 @@ Algunas características API incorporadas por defecto esperan nombres de campos 
 
 Hasta ahora, hemos discutido campos no relacionales. Pero una buena parte de una estructura de aplicación de datos es acerca de describir las relaciones entre entidades. Ahora vamos a mirar esto.
 
-
 ## Relaciones entre modelos
+
 Mirando de nuevo el diseño de nuestro módulo, tenemos estas relaciones:
 
 + Cada tarea tiene una etapa. Esa es una relación de muchos a uno, también conocida como clave extranjera. La inversa es una relación uno-a-muchos, lo que significa que cada etapa puede tener muchas tareas.
@@ -270,11 +266,11 @@ Mirando de nuevo el diseño de nuestro módulo, tenemos estas relaciones:
 
 El siguiente diagrama de relación de entidad puede ayudar a visualizar las relaciones que estamos a punto de crear en el modelo. Las líneas que terminan con un triángulo representan muchos lados de las relaciones:
 
-![EntityRelationshipDiagram](file:img/5-02.jpg)
+![EntityRelationshipDiagram](./img/5-02.jpg)
 
 Añadamos los correspondientes campos de relación a las tareas pendientes en nuestro archivo `todo_model.py`:
 
-```
+```py
 class TodoTask(models.Model): 
     _inherit = 'todo.task' 
     stage_id = fields.Many2one('todo.task.stage', 'Stage') 
@@ -302,6 +298,7 @@ Algunos argumentos con nombre adicionales también están disponibles para utili
 + `auto_join=True` permite al ORM utilizar combinaciones de SQL cuando se realizan búsquedas utilizando esta relación. Si se usan, las reglas de seguridad de acceso serán anuladas y el usuario podría tener acceso a registros relacionados que las reglas de seguridad no permitirían, pero las consultas SQL serán más eficientes y se ejecutarán más rápido.
 
 ### Relaciones de muchos a muchos (Many-to-many)
+
 La firma mínima `Many2many` acepta un argumento para el modelo relacionado, y se recomienda proporcionar también el argumento `strings` con el título del  campo.
 
 En el nivel de base de datos, no se agrega ninguna columna a las tablas existentes. En su lugar, crea automáticamente una nueva tabla de relación que tiene sólo dos campos de ID con las claves externas para las tablas relacionadas. El nombre de la tabla de relación y los nombres del campo se generan automáticamente. El nombre de tabla de relación es el nombre de ambas tablas unidos con un subrayado con `_rel` añadido a él.
@@ -352,31 +349,21 @@ El inverso de la relación `Many2many` es también un campo `Many2many`. Si tamb
 
 La relación inversa entre Tareas y Etiquetas se puede implementar de la siguiente manera:
 
-```
-class Tag(models.Model):    
-    _name = 'todo.task.tag'   
-    
-# Tag class relationship to Tasks:    
-
-
-
-
-
-    task_ids = fields.Many2many(       
-
-
-
-
-
-        'todo.task',    # related model        
-
-
-
-
-
+```py
+class Tag(models.Model):
+    _name = 'todo.task.tag'
+    # Tag class relationship to Tasks:    
+    task_ids = fields.Many2many(
+        'todo.task',  # related model        
         string='Tasks')
 
+    class Tag(models.Model):
+        _name = 'todo.task.tag'
 
+    # Tag class relationship to Tasks:    
+    task_ids = fields.Many2many(
+        'todo.task',  # related model        
+        string='Tasks')
 ```
 
 ### Relaciones inversas Uno a muchos (One-to-many)
@@ -385,42 +372,16 @@ Un inverso de un `Many2one` se puede agregar al otro extremo de la relación. Es
 
 En nuestro ejemplo, una relación inversa `One2many` en Etapas nos permite listar fácilmente todas las Tareas en esa Etapa. El código para agregar esta relación inversa a Etapas es:
 
-```
+```py
 class Stage(models.Model):
     _name = 'todo.task.stage'
-
     # Stage class relationship with Tasks:
-
-
-
-
-
-
     tasks = fields.One2many(
-
-
-
-
-
-
-        'todo.task',   # related model
-
-
-
-
-
-
-        'stage_id', # field for "this" on related model
-
-
-
-
-
-
+        'todo.task',  # related model
+        'stage_id',  # field for "this" on related model
         'Tasks in this stage')
-
-
 ```
+
 El `One2many` acepta tres argumentos posicionales: el modelo relacionado, el nombre del campo en ese modelo que hace referencia a este registro y la cadena de título. Los dos primeros argumentos posicionales corresponden a los argumentos de palabra clave `comodel_name` y `inverse_name`.
 
 Los parámetros de palabras clave adicionales disponibles son los mismos que para `Many2one : context`, `domain`, `ondelete` (aquí actúa en el lado **muchos** de la relación) y `auto_join`.
@@ -435,43 +396,19 @@ Para habilitar estas características necesitamos establecer la bandera de atrib
 
 Revisitando el modelo `Tags`, definido en el archivo `todo_model.py`, debemos editarlo para que parezca lo siguiente:
 
-```
+```py
 class Tags(models.Model):
     _name = 'todo.task.tag'
     _description = 'To-do Tag'
-
     _parent_store = True
-
-
-
-
     # _parent_name = 'parent_id'
     name = fields.Char('Name')
-
     parent_id = fields.Many2one(
-
-
-
-
-
-
-       'todo.task.tag', 'Parent Tag', ondelete='restrict')
-
-
-
-
-
-
+        'todo.task.tag', 'Parent Tag', ondelete='restrict')
     parent_left = fields.Integer('Parent Left', index=True)
-
-
-
-
-
-
     parent_right = fields.Integer('Parent Right', index=True)
-
 ```
+
 Aquí, tenemos un modelo básico, con un campo `parent_id` para referenciar el registro principal y el atributo `additional` `_parent_store`  para agregar soporte de búsqueda jerárquica. Al hacer esto, los campos `parent_left` y `parent_right` también se deben agregar.
 
 El campo que se refiere al padre se espera que se nombre `parent_id`, pero cualquier otro nombre de campo se puede utilizar siempre y cuando lo declaremos en el atributo `_parent_name`.
@@ -488,7 +425,8 @@ child_ids = fields.One2many(
 Los campos relacionales regulares hacen referencia a un comodelo fijo. El tipo de campo de referencia no tiene esta limitación y admite relaciones dinámicas, de modo que el mismo cam po puede referirse a más de un modelo.
 
 Por ejemplo, podemos usarlo para añadir un campo `Refers to` a las tareas pendientes, que puede referirse a un `User` o a un `Partner`:
-```
+
+```py
 # class TodoTask(models.Model):
     refers_to = fields.Reference(
     [('res.user', 'User'), ('res.partner', 'Partner')],
@@ -502,33 +440,17 @@ Esto puede llevarse a otro nivel de flexibilidad: existe una tabla de configurac
 Utilizando la configuración de **Modelos Referenciables**, una versión mejorada del campo `Refers to` luciría así:
 
 
-```
-
+```py
 from odoo.addons.base.res.res_request import referenceable_models
 
-
-
-
 # class TodoTask(models.Model):
-
-    refers_to = fields.Reference(
-
-
-
-
-
-
-        referenceable_models, 'Refers to')
-
-
-
-
-
+refers_to = fields.Reference(
+    referenceable_models, 'Refers to')
 ```
 
 Ten en cuenta que en Odoo 9.0 esta función utiliza una ortografía ligeramente diferente y todavía estaba utilizando la API antigua. Así que en la versión 9.0, antes de usar el código mostrado antes, tenemos que añadir algún código en la parte superior de nuestro archivo Python para envolverlo para que utilice la nueva API:
 
-```
+```py
 from openerp.addons.base.res import res_request
     def referenceable_models(self):
         return res_request.referencable_models( 
@@ -545,7 +467,7 @@ Vamos a trabajar en un ejemplo: Las etapas tienen un campo de plegado `fold`. Va
 
 Debemos editar el modelo `TodoTask` en el archivo `todo_model.py` para agregar lo siguiente:
 
-```
+```py
 # class TodoTask(models.Model):
     stage_fold = fields.Boolean(
         'Stage Folded?',
@@ -556,6 +478,7 @@ Debemos editar el modelo `TodoTask` en el archivo `todo_model.py` para agregar l
         for task in self:
             task.stage_fold = task.stage_id.fold
 ```
+
 El código anterior agrega un nuevo campo `stage_fold` y el método `_compute_stage_fold` utilizado para computarlo. El nombre de la función se pasó como una cadena, pero también se le permite pasar como una referencia llamable (el identificador de función sin comillas). En este caso, debemos asegurarnos de que la función esté definida en el archivo Python antes de que lo sea el campo.
 
 El decorador `@api.depends` es necesario cuando la computación depende de otros campos, como suele ocurrir. Permite al servidor saber cuándo volver a calcular los valores almacenados o en datos caché. Uno o más nombres de campo se aceptan como argumentos y la notación de puntos se puede utilizar para seguir relaciones de campo.
@@ -570,30 +493,20 @@ El campo computado que acabamos de crear se puede leer, pero no puede ser buscad
 
 Utilizando estos, nuestra declaración de campo computado se convierte así:
 
-```
+```py
 # class TodoTask(models.Model):
-    stage_fold = fields.Boolean(
-        string='Stage Folded?',
-        compute='_compute_stage_fold',
-        # store=False,  # the default
-
-        search='_search_stage_fold',
-
-
-
-
-
-
-        inverse='_write_stage_fold'
-
-
-
+stage_fold = fields.Boolean(
+    string='Stage Folded?',
+    compute='_compute_stage_fold',
+    # store=False,  # the default
+    search='_search_stage_fold',
+    inverse='_write_stage_fold'
 )
 ```
 
 Y las funciones de soporte son:
 
-```
+```py
 def _search_stage_fold(self, operator, value):
     return [('stage_id.fold', operator, value)]
 
@@ -608,6 +521,7 @@ La función `inverse` realiza la lógica inversa del cálculo, para encontrar el
 ### Almacenando campos computados
 
 Los valores del campo computado también se pueden almacenar en la base de datos, estableciendo `store = True` en su definición. Serán recomputados cuando cambien cualquiera de sus dependencias. Dado que los valores están ahora almacenados, se pueden buscar como campos regulares y no se necesita una función de búsqueda.
+
 ### Campos relacionados
 
 El campo computado que implementamos en la sección anterior sólo copia un valor de un registro relacionado en el propio campo del modelo. Sin embargo, este es un uso común que puede ser manejado automáticamente por Odoo.
@@ -620,12 +534,11 @@ Las Tareas pendientes se organizan en etapas personalizables y éstas se convier
 
 De forma similar a `stage_fold`, agregaremos un campo computado en el modelo de tarea, pero esta vez usando el campo relacionado más simple:
 
-```
+```py
 # class TodoTask(models.Model):
     stage_state = fields.Selection(
         related='stage_id.state',
         string='Stage State')
-
 ```
 
 Detrás del escenario, los campos relacionados son sólo campos computados que implementan convenientemente métodos `search` y `inverse`. Esto significa que podemos buscar y escribir en ellos fuera de la caja, sin necesidad de escribir un código adicional.
@@ -638,19 +551,20 @@ Las restricciones de SQL se añaden a la definición de la tabla de la base de d
 
 Un caso de uso común es agregar restricciones únicas a los modelos. Supongamos que no queremos permitir dos tareas activas con el mismo título:
 
-```
+```py
 # class TodoTask(models.Model): 
     _sql_constraints = [ 
         ('todo_task_name_uniq', 
          'UNIQUE (name, active)', 
          'Task title must be unique!')] 
 ```
+
 Las restricciones de Python pueden usar una pieza de código arbitrario para comprobar las condiciones. La función de verificación debe estar decorada con `@api.constraints`, indicando la lista de campos implicados en el chequeo. La validación se activa cuando cualquiera de ellos se modifica y generará una excepción si la condición falla.
 
 Por ejemplo, para validar que un nombre de tarea tiene al menos cinco caracteres, podríamos agregar la siguiente restricción:
 
-```
-rom odoo.exceptions import ValidationError
+```py
+from odoo.exceptions import ValidationError
 # class TodoTask(models.Model):
     @api.constrains('name')
     def _check_name_size(self):
@@ -661,6 +575,9 @@ rom odoo.exceptions import ValidationError
 ```
 
 ## Resumen
+
 Pasamos por una explicación detallada de los modelos y los campos, utilizandolos para ampliar la aplicación de tareas pendientes con etiquetas y etapas en las tareas. Aprendiste cómo definir relaciones entre modelos, incluyendo relaciones jerárquicas entre padres e hijos. Finalmente, vimos ejemplos simples de campos computados y restricciones usando código Python.
 
 En el siguiente capítulo, trabajaremos en la interfaz de usuario para estas características del modelo de backend, haciéndolas disponibles en las vistas utilizadas para interactuar con la aplicación.
+
+---
