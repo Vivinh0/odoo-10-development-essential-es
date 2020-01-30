@@ -14,14 +14,17 @@ Odoo sigue una arquitectura similar a MVC, y pasaremos por las capas durante nue
 A continuación, aprenderemos cómo configurar la seguridad de control de acceso y, finalmente, agregaremos información sobre la descripción y la marca al módulo.
 
 #### Nota
+
 Ten en cuenta que el concepto del término controlador mencionado aquí es diferente de los controladores de desarrollo web Odoo. Estos son puntos finales del programa que las páginas web pueden llamar para realizar acciones.
 
 Con este enfoque, podrás aprender gradualmente sobre los bloques básicos de construcción que conforman una aplicación y experimentar el proceso iterativo de  construir un módulo Odoo desde cero.
  
 ## Conceptos esenciales
+
 Es probable que estés empezando con Odoo, así que ahora es obviamente un buen momento para explicar los módulos de Odoo y cómo se utilizan en un desarrollo Odoo.
 
 ### Descripción de aplicaciones y módulos
+
 Es común oír hablar de los módulos y aplicaciones Odoo. Pero, ¿cuál es exactamente la diferencia entre ellos?
 
 Los **Complementos de Módulos** son los componentes básicos para las aplicaciones Odoo. Un módulo puede agregar nuevas características a Odoo, o modificar las existentes. Es un directorio que contiene un manifiesto, o archivo descriptor, llamado `__manifest__.py`, más los archivos restantes que implementan sus características.
@@ -33,6 +36,7 @@ Si su módulo es complejo y agrega funcionalidad nueva o mayor a Odoo, podrías 
 Si un módulo es una aplicación o no, se define en el manifiesto. Técnicamente no tiene ningún efecto particular sobre cómo se comporta el módulo addon. Sólo se utiliza para resaltar en la lista de **Aplicaciones**.
 
 ###  Modificando y extendiendo módulos
+
 En el ejemplo que vamos a seguir, crearemos un nuevo módulo con el menor número posible de dependencias.
 
 Sin embargo, este no será el caso típico. Principalmente, modificaremos o extenderemos un módulo ya existente.
@@ -48,9 +52,11 @@ Una vez que estemos cómodos con la creación de un nuevo módulo, podemos sumer
 Para obtener desarrollo productivo para Odoo debemos estar cómodos con el flujo de trabajo de desarrollo: administrar el entorno de desarrollo, aplicar cambios de código y comprobar los resultados. Esta sección le guiará a través de estos fundamentos.
 
 ### Creando el esqueleto básico del módulo
+
 Siguiendo las instrucciones del Capítulo 1, *Iniciando con desarrollo Odoo*, deberíamos tener el servidor Odoo en `~ / odoo-dev / odoo /`. Para mantener las cosas ordenadas, crearemos un nuevo directorio junto con él para alojar nuestros módulos personalizados, en `~ / odoo-dev / custom-addons`.
 
 Odoo incluye un comando `scaffold` para crear automáticamente un nuevo directorio de módulo, con una estructura básica ya establecida. Puedes obtener más información al respecto con el siguiente comando:
+
 ```
 $ ~/odoo-dev/odoo/odoo-bin scaffold --help
 ```
@@ -60,6 +66,7 @@ Es posible que desees tener esto en cuenta cuando empieces a trabajar en tu pró
 Un módulo addon Odoo es un directorio que contiene un archivo descriptor `__manifest__.py`.
 
 #### Nota
+
 En versiones anteriores, este archivo descriptor se denominó `__openerp__.py`. Este nombre aún se admite pero está obsoleto.
 
 También necesita ser Python importable, por lo que también debe tener un archivo `__init__.py`.
@@ -79,8 +86,7 @@ A continuación, necesitamos crear el archivo de manifiesto. Debería contener s
 
 Ahora debemos añadir un archivo `__manifest__.py` junto al archivo `__init__.py` con el siguiente contenido:
 
-```
-
+```python
 { 
     'name': 'To-Do Application', 
     'description': 'Manage your personal
@@ -90,8 +96,8 @@ Ahora debemos añadir un archivo `__manifest__.py` junto al archivo `__init__.py
     'depends': ['base'], 
     'application': True, 
 }
-
 ```
+
 El atributo `depends` puede tener una lista de otros módulos que se requieren. Odoo los instalará automáticamente cuando este módulo esté instalado. No es un atributo obligatorio, pero se aconseja tenerlo siempre. Si no se necesitan dependencias en particular, debemos depender del módulo básico `base`.
 
 Debes tener cuidado de asegurarte de que todas las dependencias se establecen explícitamente aquí; De lo contrario, el módulo puede fallar al instalar en una base de datos limpia (debido a las dependencias que faltan) o tener errores de carga si por casualidad los otros módulos necesarios se cargan después.
@@ -114,9 +120,11 @@ Estas otras teclas descriptoras también están disponibles:
 Desde Odoo 8.0, en lugar de la clave de `description`, podemos utilizar un archivo `README.rst` o `README.md` en el directorio superior del módulo.
 
 ### Una palabra sobre las licencias
+
 Elegir una licencia para tu trabajo es muy importante, y debes considerar cuidadosamente cuál es la mejor opción para tí y sus implicaciones. Las licencias más utilizadas para los módulos Odoo son la **Licencia Pública General Menor de GNU (LGLP¨** y la **Licencia Pública General de Affero (AGPL)**. La LGPL es más permisiva y permite el trabajo derivado comercial, sin la necesidad de compartir el código fuente correspondiente. La AGPL es una licencia de código abierto más fuerte, y requiere trabajo derivado y alojamiento de servicio para compartir su código fuente. Obten más información acerca de las licencias GNU en https://www.gnu.org/licenses/.
 
 ### Añadiendo a la ruta addons
+
 Ahora que tenemos un nuevo módulo minimalista, queremos ponerlo a disposición de la instancia de Odoo.
 
 Para ello, debemos asegurarnos de que el directorio que contiene el módulo está en la ruta addons, entonces actualiza la lista de módulos Odoo.
@@ -127,28 +135,27 @@ Posicionaremos en nuestro directorio de trabajo e iniciaremos el servidor con la
 
 ```
 $ cd ~/odoo-dev
-
-
 $ ./odoo/odoo-bin -d todo --addons-path="custom-addons,odoo/addons" --save
 ```
+
 La opción `--save` guarda las opciones que utilizaste en un archivo de configuración. Esto nos evita repetirlas cada vez que reiniciamos el servidor: solo se ejecuta `./odoo-bin` y se utilizará la última opción guardada.
 
 Observa atentamente el registro del servidor. Debe tener una línea `INFO? Odoo: addons paths: [...]`. Debe incluir nuestro directorio de `custom-addons`.
 
 Recuerda incluir también cualquier otro directorio de complementos que puedas estar utilizando. Por ejemplo, si también tienes un directorio `~ / odoo-dev / extra` que contiene módulos adicionales que se utilizarán, es posible que desees incluirlos también utilizando la opción `--addons-path`:
-```
 
+```
 --addons-path = "custom-addons, extra, odoo / addons"
-
 ```
-
 
 Ahora necesitamos la instancia Odoo para reconocer el nuevo módulo que acabamos de agregar.
 
 ### Instalando el nuevo módulo
+
 En el menú superior de **Aplicaciones**, seleccione la opción **Actualizar Lista de Aplicaciones**. Esto actualizará la lista de módulos, añadiendo los módulos que se hayan agregado desde la última actualización a la lista. Recuerda que necesitamos activar el modo desarrollador para que esta opción sea visible. Esto se hace en el panel de **Configuración**, en el enlace de abajo a la derecha, debajo de la información del número de versión de Odoo.
 
 #### Tip
+
 Asegúrate de que tu sesión de cliente web está funcionando con la base de datos correcta. Puedes comprobarlo en la parte superior derecha: el nombre de la base de datos se muestra entre paréntesis, justo después del nombre de usuario. Una manera de aplicar la base de datos correcta es iniciar la instancia del servidor con la opción adicional `--db-filter = ^ MYDB $`.
 
 La opción **Aplicaciones** nos muestra la lista de módulos disponibles. De forma predeterminada, muestra sólo los módulos de aplicación. Ya que hemos creado un módulo de aplicación, no necesitamos eliminar ese filtro para verlo. Escribe `todo` en la búsqueda y debes ver nuestro nuevo módulo, listo para ser instalado:
@@ -158,6 +165,7 @@ La opción **Aplicaciones** nos muestra la lista de módulos disponibles. De for
 Ahora haZ clic en el botón **Instalar** del módulo y ¡estamos listos!
 
 ### Actualizando un módulo
+
 El desarrollo de un módulo es un proceso iterativo, y querrás que los cambios hechos en los archivos fuente sean aplicados y hechos visibles en Odoo.
 
 En muchos casos, esto se realiza actualizando el módulo: busca el módulo en la lista de **Aplicaciones** y una vez que ya esté instalado, tendrás disponible un botón de **Actualización**.
@@ -174,7 +182,6 @@ $ ./odoo-bin -d todo -u todo_app
 
 ```
 
-
 La opción `-u` (o `--update` en el forma larga) requiere la opción `-d` y acepta una lista de módulos separados por comas para actualizar. Por ejemplo, podríamos usar `-u todo_app, mail`. Cuando se actualiza un módulo, también se actualizan todos los módulos instalados que dependen de él. Esto es esencial para mantener la integridad de los mecanismos de herencia, utilizados para extender  características.
 
 A lo largo del libro, cuando necesites aplicar el trabajo realizado en módulos, la forma más segura es reiniciar la instancia Odoo con el comando anterior. Al presionar la tecla de flecha hacia arriba, se obtiene el comando anterior que se utilizó. Por lo tanto, la mayoría de las veces, te encontrará usando la combinación de teclas _**Ctrl + C**_, arriba y _**Enter**_.
@@ -182,14 +189,17 @@ A lo largo del libro, cuando necesites aplicar el trabajo realizado en módulos,
 Desafortunadamente, tanto la actualización de la lista de módulos como la desinstalación de módulos son acciones que no están disponibles a través de la línea de comandos. Estos deben hacerse a través de la interfaz web en el menú de **Aplicaciones**.
 
 ### El modo de desarrollo del servidor
+
 En Odoo 10 se introdujo una nueva opción que proporciona características amigables para los desarrolladores. Para usarla, inicia la instancia del servidor con la opción adicional `--dev = all`.
 Esto permite que algunas características prácticas aceleren nuestro ciclo de desarrollo. Los más importantes son:
+
 + Recargar código Python automáticamente, una vez que se guarda un archivo Python, evitando un reinicio manual del servidor
 + Leer las definiciones de vista directamente desde los archivos XML, evitando actualizaciones manuales del módulo
 
 La opción `--dev` acepta una lista de opciones separadas por comas, aunque la opción `all` será adecuada la mayor parte del tiempo. También podemos especificar el depurador que preferimos usar. De forma predeterminada, se utiliza el depurador Python, `pdb`. Algunas personas pueden preferir instalar y usar depuradores alternativos. Aquí también se admiten `ipdb` y `pudb`.
 
 ## La capa modelo
+
 Ahora que Odoo conoce nuestro nuevo módulo, comencemos agregándole un modelo simple.
 
 Los modelos describen objetos de negocio, como una oportunidad, ordenes de clientes o socios (cliente, proveedor, etc.). Un modelo tiene una lista de atributos y también puede definir su negocio específico.
@@ -199,11 +209,12 @@ Los modelos se implementan utilizando una clase Python derivada de una clase de 
 Nuestro módulo será una aplicación muy simple para mantener las tareas pendientes. Estas tareas tendrán un solo campo de texto para la descripción y una casilla de verificación para marcarlas como completas. Más adelante deberíamos añadir un botón para limpiar la lista de tareas de las tareas completas.
 
 ### Creando el modelo de datos
+
 Las directrices de desarrollo de Odoo establecen que los archivos Python para los modelos deben colocarse dentro de un subdirectorio `models`. Para simplificar, no lo seguiremos aquí, así que vamos a crar un archivo `todo_model.py` en el directorio principal del módulo `todo_app`.
 
 Añade el siguiente contenido:
 
-``` 
+```python
 # -*- coding: utf-8 -*- 
 from odoo import models, fields 
 class TodoTask(models.Model): 
@@ -212,8 +223,8 @@ class TodoTask(models.Model):
     name = fields.Char('Description', required=True) 
     is_done = fields.Boolean('Done?') 
     active = fields.Boolean('Active?', default=True)
-
 ```
+
 La primera línea es un marcador especial que indica al intérprete de Python que este archivo tiene UTF-8 para que pueda esperar y manejar caracteres no ASCII. No usaremos ninguno, pero es una buena práctica tenerlo de todos modos.
 
 La segunda línea es una instrucción de importación de código Python, haciendo disponibles los objetos  `models` y  `fields` del núcleo Odoo.
@@ -230,9 +241,10 @@ Las tres últimas líneas definen los campos del modelo. Vale la pena señalar q
 
 En este momento, este archivo aún no es utilizado por el módulo. Debemos decirle a Python que lo cargue con el módulo en el archivo `__init__.py`. Vamos a editarlo para agregar la siguiente línea:
 
-```
+```py
 from . importar todo_modelo
 ```
+
 ¡Eso es! Para que nuestros cambios de código de Python entren en vigor, la instancia de servidor debe reiniciarse (a menos que esté utilizando el modo `--dev`).
 
 No veremos ninguna opción de menú para acceder a este nuevo modelo ya que no los hemos añadido aún. Sin embargo, podemos inspeccionar el modelo recién creado usando el menú **Technical**. En el menú superior **Settings**, ve a **Technical | Database Structure | Models**, busca el modelo `todo.task` en la lista y haz clic en él para ver su definición:
@@ -249,20 +261,22 @@ También podemos ver algunos campos adicionales que no declaramos. Estos son cam
 +  `__last_update` es un ayudante que en realidad no se almacena en la base de datos. Se utiliza para verificaciones de concurrencia.
 
 ### Añadiendo pruebas automatizadas
+
 Las mejores prácticas de programación incluyen tener pruebas automatizadas para tu código. Esto es aún más importante para lenguajes dinámicos como Python. Como no hay ningún paso de compilación, no puede estar seguro de que no haya errores sintácticos hasta que el intérprete realmente  ejecute el código. Un buen editor puede ayudarnos a detectar estos problemas con antelación, pero no puede ayudarnos a asegurar que el código se ejecute como lo desean las pruebas automatizadas.
 
 Odoo soporta dos formas de describir las pruebas: ya sea utilizando archivos de datos YAML o utilizando código Python, basado en la biblioteca `Unittest2`. Las pruebas YAML son un legado de versiones anteriores, y no se recomiendan. Preferiremos usar pruebas de Python y añadiremos un caso básico de prueba a nuestro módulo.
 
-
 Los archivos de código de prueba deben tener un nombre que empiece por `test_` y se debe importar desde `tests / __ init__.py`. Pero el directorio de `test` (o submódulo Python) no se debe importar desde la parte superior del módulo  `__init__.py`, ya que se descubrirá y cargará automáticamente sólo cuando se ejecuten pruebas.
 
 Las pruebas deben colocarse en un subdirectorio `test/`. Añade un archivo `tests / __ init__.py` con lo siguiente:
-```
-from . import test_todo
 
+```py
+from . import test_todo
 ```
+
 Ahora, añade el código de prueba real disponíble en el archivo  `tests/test_todo.py`:
-```
+
+```py
 # -*- coding: utf-8 -*- 
 from odoo.tests.common import TransactionCase 
  
@@ -273,19 +287,16 @@ class TestTodo(TransactionCase):
         Todo = self.env['todo.task'] 
         task = Todo.create({'name': 'Test Task'}) 
         self.assertEqual(task.is_done, False)
-
 ```
+
 Esto agrega un caso simple de prueba para crear una nueva tarea y verifica que el campo ** Is Done?** Tiene el valor predeterminado correcto.
 
 Ahora queremos hacer nuestras pruebas. Esto se hace agregando la opción `--test-enable` durante la instalación del módulo:
 
 ```
-
 $ ./odoo-bin -d todo -i todo_app --test-enable
 
 ```
-
-
 
 El servidor Odoo buscará un subdirectorio tests/ en los módulos actualizados y los ejecutará. Si alguna de las pruebas falla, el registro del servidor te mostrará eso.
 
@@ -433,36 +444,21 @@ Los atributos básicos de un botón comprenden lo siguiente:
 
 ### Uso de grupos para organizar formularios
 
-La etiqueta `<group> `te permite organizar el contenido del formulario. Colocar elementos `<group>` dentro de un elemento `<group>` crea un diseño de dos columnas dentro del grupo externo. Se aconseja que los elementos del grupo tengan un atributo de nombre para que sea más fácil para otros módulos extenderlos.
+La etiqueta `<group>` te permite organizar el contenido del formulario. Colocar elementos `<group>` dentro de un elemento `<group>` crea un diseño de dos columnas dentro del grupo externo. Se aconseja que los elementos del grupo tengan un atributo de nombre para que sea más fácil para otros módulos extenderlos.
 
 Usaremos esto para organizar mejor nuestro contenido. Cambiemos el contenido `<sheet>` de nuestro formulario para que coincida con este:
 
-```
-<sheet> 
-  
-<group name="group_top"> 
-    <group name="group_left">
-
-
-
- 
-      <field name="name"/> 
-    
-</group> 
-    <group name="group_right">
-
-
-
- 
-      <field name="is_done"/> 
-      <field name="active" readonly="1"/> 
-    
-</group> 
-  </group>
-
-
-
- 
+```xml
+<sheet>
+    <group name="group_top">
+        <group name="group_left">
+            <field name="name"/>
+        </group>
+        <group name="group_right">
+            <field name="is_done"/>
+            <field name="active" readonly="1"/>
+        </group>
+    </group>
 </sheet> 
 ```
 
@@ -470,47 +466,51 @@ Usaremos esto para organizar mejor nuestro contenido. Cambiemos el contenido `<s
 
 En este punto, nuestro formulario `todo.task` debe verse así:
 
-```
-<form> 
-  <header> 
-    <button name="do_toggle_done" type="object" 
-      string="Toggle Done" class="oe_highlight" /> 
-    <button name="do_clear_done" type="object" 
-      string="Clear All Done" /> 
-  </header> 
-  <sheet> 
-    <group name="group_top"> 
-      <group name="group_left"> 
-        <field name="name"/> 
-      </group> 
-      <group name="group_right"> 
-        <field name="is_done"/> 
-        <field name="active" readonly="1" /> 
-      </group> 
-    </group> 
-  </sheet> 
+```xml
+<form>
+    <header>
+        <button name="do_toggle_done" type="object"
+                string="Toggle Done" class="oe_highlight"/>
+        <button name="do_clear_done" type="object"
+                string="Clear All Done"/>
+    </header>
+    <sheet>
+        <group name="group_top">
+            <group name="group_left">
+                <field name="name"/>
+            </group>
+            <group name="group_right">
+                <field name="is_done"/>
+                <field name="active" readonly="1"/>
+            </group>
+        </group>
+    </sheet>
 </form> 
 ```
+
 ### Tip
+
 Recuerda que para que los cambios se carguen en nuestra base de datos Odoo, se necesita una actualización del módulo. Para ver los cambios en el cliente web, el formulario debe ser recargado: haz clic de nuevo en la opción de menú que lo abre o vuelve a cargar la página del navegador (_**F5**_ en la mayoría de los navegadores).
 
 Los botones de acción no funcionarán aún, ya que todavía necesitamos agregar su lógica de negocio. 
+
 ### Adición de vistas de lista y de búsqueda
 
 Cuando se visualiza un modelo en modo de lista, se utiliza una vista `<tree>`. Las vistas de árbol son capaces de mostrar líneas organizadas en jerarquías, pero la mayoría de las veces, se utilizan para mostrar listas sin formato.
 
 Podemos agregar la siguiente definición de vista `tree` a `todo_view.xml`:
-```
-<record id="view_tree_todo_task" model="ir.ui.view"> 
-  <field name="name">To-do Task Tree</field> 
-  <field name="model">todo.task</field> 
-  <field name="arch" type="xml"> 
-    <tree colors="decoration-muted:is_done==True"> 
-      <field name="name"/> 
-      <field name="is_done"/> 
-    </tree> 
-  </field> 
-</record> 
+
+```xml
+<record id="view_tree_todo_task" model="ir.ui.view">
+    <field name="name">To-do Task Tree</field>
+    <field name="model">todo.task</field>
+    <field name="arch" type="xml">
+        <tree colors="decoration-muted:is_done==True">
+            <field name="name"/>
+            <field name="is_done"/>
+        </tree>
+    </field>
+</record
 ```
 
 Esto define una lista con sólo dos columnas: `name` y `is_done`. También añadimos un toque agradable: las líneas para las tareas hechas (`is_done == True`) se muestran en gris. Esto se hace aplicando la clase silenciada Bootstrap. Consulta http://getbootstrap.com/css/#helper-classes-colors para obtener más información sobre Bootstrap y sus colores contextuales.
@@ -518,25 +518,21 @@ Esto define una lista con sólo dos columnas: `name` y `is_done`. También añad
 En la esquina superior derecha de la lista, Odoo muestra un cuadro de búsqueda. Los campos que busca y los filtros disponibles se definen mediante una vista `<search>`.
 
 Como antes, agregamos esto a `todo_view.xml`:
-```
-<record id="view_filter_todo_task" model="ir.ui.view"> 
-  <field name="name">To-do Task Filter</field> 
-  <field name="model">todo.task</field> 
-  <field name="arch" type="xml"> 
-   
- <search> 
-      <field name="name"/> 
-      <filter string="Not Done" 
-        domain="[('is_done','=',False)]"/> 
-      <filter string="Done" 
-        domain="[('is_done','!=',False)]"/> 
-    </search>
 
-
-
- 
-  </field> 
-</record> 
+```xml
+<record id="view_filter_todo_task" model="ir.ui.view">
+    <field name="name">To-do Task Filter</field>
+    <field name="model">todo.task</field>
+    <field name="arch" type="xml">
+        <search>
+            <field name="name"/>
+            <filter string="Not Done"
+                    domain="[('is_done','=',False)]"/>
+            <filter string="Done"
+                    domain="[('is_done','!=',False)]"/>
+        </search>
+    </field>
+</record>
 ```
 
 Los elementos `<field>` definen campos que también se buscan al escribir en el cuadro de búsqueda. Los elementos `<filter>` añaden condiciones de filtro predefinidas, que se pueden alternar con un clic de usuario, definido mediante el uso de una sintaxis específica.
@@ -544,27 +540,34 @@ Los elementos `<field>` definen campos que también se buscan al escribir en el 
 ## La capa de lógica de negocio
 
 Ahora vamos a añadir algo de lógica a nuestros botones. Esto se hace con código Python, utilizando los métodos de la clase de modelos Python.
+
 ### Añadiendo lógica de negocio
 
-Debemos editar el archivo Python `todo_model.py` para agregar a la clase los métodos llamados por los botones. Primero, necesitamos importar la nueva API, así que agréguala a la declaración de importación en la parte superior del archivo Python:
-```
+Debemos editar el archivo Python `todo_model.py` para agregar a la clase los métodos llamados por los botones. Primero, necesitamos importar la nueva API, así que agrégala a la declaración de importación en la parte superior del archivo Python:
+
+```python
 from odoo import models, fields, api
 ```
 
 La acción del botón **Toggle Done** será muy simple: solo cambia la bandera **Is Done?**. Para la lógica de los registros, utiliza el decorador `@api.multi`. Aquí, `self` representará un conjunto de registros, y entonces deberíamos hacer un bucle a través de cada registro.
 
-Dentro de la clase TodoTask, añade esto:
-```
-@api.multi 
+Dentro de la clase **TodoTask**, añade esto:
+
+```python
+@api.multi
 def do_toggle_done(self): 
     for task in self: 
         task.is_done = not task.is_done 
     return True
 ```
+
+Si el código anterior da error al pulsar el botón probar a reiniciar Odoo.
+
 El código pasa por todos los registros de tarea y, para cada uno, modifica el campo `is_done`, invirtiendo su valor. El método no necesita devolver nada, pero debemos tenerlo al menos para devolver un valor `True`. La razón es que los clientes pueden utilizar XML-RPC para llamar a estos métodos y este protocolo no admite funciones de servidor devolviendo sólo un valor `None`.
 
 Para el botón **Clear All Done**, queremos ir un poco más lejos. Debe buscar todos los registros activos que están hechos, y hacerlos inactivos. Normalmente, se espera que los botones de formulario actúen sólo en el registro seleccionado, pero en este caso, queremos que actúe también en registros distintos del actual:
-```
+
+```python
 @api.model 
 def do_clear_done(self): 
     dones = self.search([('is_done', '=', True)]) 
@@ -572,16 +575,17 @@ def do_clear_done(self):
     return True 
 ```
 
-
-En los métodos decorados con `@ api.model`, la variable `self` representa el modelo sin registro en particular. Construiremos un conjunto de registros `dones` que contenga todas las tareas marcadas como terminadas. A continuación, establecemos el indicador `active` para `False` en ellos.
+En los métodos decorados con `@api.model`, la variable `self` representa el modelo sin registro en particular. Construiremos un conjunto de registros `dones` que contenga todas las tareas marcadas como terminadas. A continuación, establecemos el indicador `active` para `False` en ellos.
 
 El método de búsqueda es un método API que devuelve los registros que cumplen algunas condiciones. Estas condiciones están escritas en un dominio, que es una lista de tripletes. Exploraremos los dominios con más detalle en el Capítulo 6, *Vistas – Diseñando la interfaz de usuario*.
 
 El método `write` establece los valores de una vez en todos los elementos del conjunto de registros. Los valores a escribir se describen utilizando un diccionario. Usar `write here` es más eficiente que iterar a través del conjunto de registros para asignar el valor a cada uno de ellos uno por uno.
+
 ### Añadiendo de pruebas
 
-Ahora debemos agregar pruebas para la lógica de negocio. Idealmente, queremos que cada línea de código sea cubierta por al menos un caso de prueba. En `tests / test_todo.py`, agregua unas cuantas líneas más de código al método `test_create ()`:
-```
+Ahora debemos agregar pruebas para la lógica de negocio. Idealmente, queremos que cada línea de código sea cubierta por al menos un caso de prueba. En `tests / test_todo.py`, agrega unas cuantas líneas más de código al método `test_create ()`:
+
+```python
 # def test_create(self): 
         # ... 
        
@@ -591,7 +595,6 @@ Ahora debemos agregar pruebas para la lógica de negocio. Idealmente, queremos q
         # Test Clear Done 
         Todo.do_clear_done() 
         self.assertFalse(task.active)
-
 ```
 
 
@@ -599,7 +602,6 @@ Si ahora ejecutamos las pruebas y los métodos del modelo están correctamente e
 
 ```
 $ ./odoo-bin -d todo -i todo_app --test-enable
-
 ```
 ## Configurando la seguridad de acceso
 
@@ -607,11 +609,7 @@ Es posible que haya notado que, al cargar, nuestro módulo recibe un mensaje de 
 
 **The model todo.task has no access rules, consider adding one.**
 
-
 (**El modelo todo.task no tiene reglas de acceso, considere agregar una.**)
-
-
-
 
 El mensaje es bastante claro: nuestro nuevo modelo no tiene reglas de acceso, por lo que no puede ser utilizado por nadie que no sea el superusuario de admin. Como superusuario, el admin ignora las reglas de acceso a datos, y es por eso que hemos podido utilizar el formulario sin errores. Pero debemos corregir esto antes de que otros usuarios puedan usar nuestro modelo.
 
@@ -622,7 +620,8 @@ Otra cuestión que todavía tenemos que abordar es que queremos que las tareas p
 De hecho, nuestras pruebas deben estar fallando en este momento debido a las reglas de acceso que faltan. Ellas no están porque se hacen con el usuario admin. Por lo tanto, debemos cambiarlos para que utilicen el usuario Demo en su lugar.
 
 Para ello, debemos editar el archivo `tests / test_todo.py` para añadir un método `setUp`:
-```
+
+```python
 # class TestTodo(TransactionCase): 
  
     def setUp(self, *args, **kwargs): 
@@ -637,19 +636,20 @@ Para ello, debemos editar el archivo `tests / test_todo.py` para añadir un mét
 Esta primera instrucción llama al código `setUp` de la clase padre. Los siguientes cambian el entorno utilizado para ejecutar las pruebas, `self.env`, a una nueva usando el usuario `Demo`. No se necesitan más cambios en las pruebas que ya escribimos.
 
 También debemos añadir un caso de prueba para asegurarnos de que los usuarios sólo pueden ver sus propias tareas. Para ello, primero, agregua una importación adicional en la parte superior:
-```
-from odoo.exceptions import AccessError 
 
 ```
-A continuación, agregua un método adicional a la clase de prueba:
+from odoo.exceptions import AccessError 
 ```
+
+A continuación, agregua un método adicional a la clase de prueba:
+
+```python
     def test_record_rule(self): 
         "Test per user record rules" 
         Todo = self.env['todo.task'] 
         task = Todo.sudo().create({'name': 'Admin Task'}) 
         with self.assertRaises(AccessError): 
             Todo.browse([task.id]).name 
-
 ```
 
 Dado que nuestro método `env` ahora está utilizando el usuario de Demo, usamos el método `sudo ()` para cambiar el contexto al usuario admin. A continuación, lo usamos para crear una tarea que no debería ser accesible para el usuario Demo.
@@ -671,10 +671,10 @@ Aquí podemos ver la ACL de algunos modelos. Indica, por grupo de seguridad, qu�
 Esta información debe ser proporcionada por el módulo utilizando un archivo de datos para cargar las líneas en el modelo `ir.model.access`. Vamos a agregar acceso completo al grupo de empleados en el modelo. El empleado es el grupo básico de acceso al que casi todos pertenecen.
 
 Esto se hace utilizando un archivo CSV denominado `security / ir.model.access.csv`. Vamos a agregarlo con el siguiente contenido:
-```
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink 
-acess_todo_task_group_user,todo.task.user,model_todo_task,base.group_user,1,1,1,1 
 
+```
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+acess_todo_task_group_user,todo.task.user,model_todo_task,base.group_user,1,1,1,1
 ```
 
 El nombre de archivo corresponde al modelo para cargar los datos, y la primera línea del archivo tiene los nombres de columna. Estas son las columnas proporcionadas en nuestro archivo CSV:
@@ -686,25 +686,28 @@ El nombre de archivo corresponde al modelo para cargar los datos, y la primera l
 + Los campos `perm` marcan el acceso a garantizar `read`, `write`, ` create` o `un link` (borrar) el acceso.
 
 No debemos olvidar añadir la referencia a este nuevo archivo en el atributo de datos del descriptor `__manifest__.py`. Debe tener un aspecto como este:
-```
-'data': [ 
+
+```python
+'data': [
     'security/ir.model.access.csv', 
     'views/todo_view.xml', 
     'views/todo_menu.xml', 
 ],
-
 ```
+
 Como antes, actualice el módulo para que estas adiciones entren en vigor. El mensaje de advertencia debe desaparecer, y podemos confirmar que los permisos están bien iniciando sesión con el usuario `demo` (la contraseña también es `demo`). Si ejecutamos nuestras pruebas ahora solo deberían fallar el caso de prueba `test_record_rule`.
+
 ### Reglas de acceso a nivel de fila
 
-Podemos encontrar la opción **Record Rules** en el menú **Technical**, junto con **Access Control List*.
+Podemos encontrar la opción **Record Rules** en el menú **Technical**, junto con **Access Control List**.
 
 Las reglas de registro se definen en el modelo `ir.rule`. Como de costumbre, necesitamos proporcionar un nombre distintivo. También necesitamos el modelo en el que operan y el filtro de dominio que se utilizará para la restricción de acceso. El filtro de dominio utiliza la lista usual de tuplas sintáctica utilizada en Odoo.
 
 Por lo general, las reglas se aplican a algunos grupos de seguridad en particular. En nuestro caso, lo haremos aplicable al grupo Empleados. Si no se aplica a ningún grupo de seguridad en particular, se considera global (el campo `global` se establece automáticamente en `True`). Las reglas globales son diferentes porque imponen restricciones que las reglas no globales no pueden anular.
 
 Para agregar la regla de registro, debemos crear un archivo `security / todo_access_rules.xml` con el siguiente contenido:
-```
+
+```xml
 <?xml version="1.0" encoding="utf-8"?> 
 <odoo> 
   <data noupdate="1"> 
@@ -718,18 +721,18 @@ Para agregar la regla de registro, debemos crear un archivo `security / todo_acc
       [(4,ref('base.group_user'))]"/> 
     </record> 
   </data> 
-</odoo> 
-
+</odoo>
 ```
 
 ### Nota
 
-Observa el atributo `noupdate = "1"`. Significa que estos datos no se actualizarán en actualizaciones de módulos. Esto le permitirá ser personalizado más adelante ya que las actualizaciones de módulos no destruirán los cambios realizados por el usuario. Pero ten en cuenta que esto también será el caso durante el desarrollo, por lo que es posible que desees establecer `noupdate = "0" ` durante el desarrollo hasta que estéss satisfecho con el archivo de datos.
+Observa el atributo `noupdate = "1"`. Significa que estos datos no se actualizarán en actualizaciones de módulos. Esto le permitirá ser personalizado más adelante ya que las actualizaciones de módulos no destruirán los cambios realizados por el usuario. Pero ten en cuenta que esto también será el caso durante el desarrollo, por lo que es posible que desees establecer `noupdate = "0"` durante el desarrollo hasta que estés satisfecho con el archivo de datos.
 
-En el campo de grupos, también encontrarás una expresión especial. Es un campo relacional de uno a muchos, y tienen una sintaxis especial para operar. En este caso, la tupla (4, x) indica anexar `x` a los registros, y aquí `x` es una referencia al grupo Empleados, identificado por `base.group_user`. Esta sintaxis especial de escritura de uno-a-muchos se discute con más detalle en el Capítulo 4, *Datos de Módulo*.
+En el campo de grupos, también encontrarás una expresión especial. Es un campo relacional de uno a muchos, y tienen una sintaxis especial para operar. En este caso, la tupla (4, x) indica anexar `x` a los registros, y aquí `x` es una referencia al grupo Empleados, identificado por `base.group_user`. Esta sintaxis especial de escritura de one-to-many se discute con más detalle en el Capítulo 4, *Datos de Módulo*.
 
 Como antes, debemos añadir el archivo a `__manifest__.py` antes de poder cargarlo en el módulo:
-```
+
+```python
 'data': [ 
   'security/ir.model.access.csv', 
   'security/todo_access_rules.xml', 
@@ -752,7 +755,6 @@ Los siguientes comandos deben hacer ese truco para nosotros:
 ```
 $ mkdir -p ~/odoo-dev/custom-addons/todo_app/static/description
 $ cp ~/odoo-dev/odoo/addons/note/static/description/icon.png ~/odoo-dev/custom-addons/todo_app/static/description
-
 ```
 
 Ahora, si actualizamos la lista de módulos, nuestro módulo debe mostrarse con el nuevo icono.
@@ -769,6 +771,4 @@ Recuerde siempre, cuando se agregan campos del modelo, se necesita una actualiza
 
 En el siguiente capítulo, aprenderás cómo construir módulos que se apilarán en los existentes para agregar características.
 
-
-
-
+---
