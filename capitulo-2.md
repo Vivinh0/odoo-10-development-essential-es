@@ -414,25 +414,19 @@ Los formularios pueden tener botones para realizar acciones. Estos botones puede
 Pueden colocarse en cualquier lugar dentro de un formulario, pero para los formularios de estilo de documento, el lugar recomendado para ellos es la sección `<header>`.
 
 Para nuestra aplicación, agregaremos dos botones para ejecutar los métodos del modelo `todo.task`:
+
+```xml
+<header>
+    <button name="do_toggle_done" type="object"
+            string="Toggle Done" class="oe_highlight"/>
+    <button name="do_clear_done" type="object"
+            string="Clear All Done"/>
+</header>
 ```
-
-<header> 
-  
-<button name="do_toggle_done" type="object" 
-    string="Toggle Done" class="oe_highlight" /> 
-  <button name="do_clear_done" type="object" 
-    string="Clear All Done" />
-
-
-
- 
-</header> 
-```
-
 
 Los atributos básicos de un botón comprenden lo siguiente:
 
-+ `stryng` con el texto a mostrar en el botón
++ `string` con el texto a mostrar en el botón
 + `type` de acción que realiza
 + `name` es el identificador de esa acción
 + `class` es un atributo opcional para aplicar estilos CSS, como en HTML normal
