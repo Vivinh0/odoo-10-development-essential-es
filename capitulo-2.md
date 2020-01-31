@@ -735,8 +735,7 @@ Como antes, debemos añadir el archivo a `__manifest__.py` antes de poder cargar
   'security/todo_access_rules.xml', 
   'todo_view.xml', 
   'todo_menu.xml', 
-], 
-
+],
 ```
 
 Si lo hicimos bien, podemos ejecutar las pruebas de módulo y ahora deben pasar.
