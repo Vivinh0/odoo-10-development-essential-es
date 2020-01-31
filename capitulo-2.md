@@ -89,9 +89,7 @@ Ahora debemos añadir un archivo `__manifest__.py` junto al archivo `__init__.py
 ```python
 { 
     'name': 'To-Do Application', 
-    'description': 'Manage your personal
-    To-Do 
-    tasks.', 
+    'description': 'Manage your personal To-Do tasks.', 
     'author': 'Daniel Reis', 
     'depends': ['base'], 
     'application': True, 
@@ -162,7 +160,7 @@ La opción **Aplicaciones** nos muestra la lista de módulos disponibles. De for
 
 ![Installed](./img/2-01.jpg)
 
-Ahora haZ clic en el botón **Instalar** del módulo y ¡estamos listos!
+Ahora haz clic en el botón **Instalar** del módulo y ¡estamos listos!
 
 ### Actualizando un módulo
 
@@ -179,7 +177,6 @@ En el terminal donde se ejecuta la instancia de servidor, utiliza **Ctrl + C** p
 
 ```
 $ ./odoo-bin -d todo -u todo_app
-
 ```
 
 La opción `-u` (o `--update` en el forma larga) requiere la opción `-d` y acepta una lista de módulos separados por comas para actualizar. Por ejemplo, podríamos usar `-u todo_app, mail`. Cuando se actualiza un módulo, también se actualizan todos los módulos instalados que dependen de él. Esto es esencial para mantener la integridad de los mecanismos de herencia, utilizados para extender  características.
@@ -242,7 +239,7 @@ Las tres últimas líneas definen los campos del modelo. Vale la pena señalar q
 En este momento, este archivo aún no es utilizado por el módulo. Debemos decirle a Python que lo cargue con el módulo en el archivo `__init__.py`. Vamos a editarlo para agregar la siguiente línea:
 
 ```py
-from . importar todo_modelo
+from . import todo_model
 ```
 
 ¡Eso es! Para que nuestros cambios de código de Python entren en vigor, la instancia de servidor debe reiniciarse (a menos que esté utilizando el modo `--dev`).
