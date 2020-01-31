@@ -160,7 +160,7 @@ Asegúrate de que tu sesión de cliente web está funcionando con la base de dat
 
 La opción **Aplicaciones** nos muestra la lista de módulos disponibles. De forma predeterminada, muestra sólo los módulos de aplicación. Ya que hemos creado un módulo de aplicación, no necesitamos eliminar ese filtro para verlo. Escribe `todo` en la búsqueda y debes ver nuestro nuevo módulo, listo para ser instalado:
 
-![Installed]./img/2-01.jpg)
+![Installed](./img/2-01.jpg)
 
 Ahora haZ clic en el botón **Instalar** del módulo y ¡estamos listos!
 

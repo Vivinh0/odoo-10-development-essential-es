@@ -102,7 +102,6 @@ $ sudo apt-get install npm  # Install NodeJs and its package manager
 $ sudo ln -s /usr/bin/nodejs /usr/bin/node  # call node runs nodejs
 
 $ sudo npm install -g less less-plugin-clean-css  #Install less compiler
-
 ```
 
 Partiendo de la versión 9.0, el cliente web de Odoo requiere que el preprocesador `less` CSS esté instalado en el sistema para que las páginas web puedan ser renderizadas correctamente. Para instalar esto, necesitamos Node.js y npm.
