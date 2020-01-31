@@ -59,37 +59,32 @@ Nombraremos este nuevo módulo addon como `todo_kanban` y crearemos los archivos
  'description': 'Kanban board for to-do tasks.', 
  'author': 'Daniel Reis', 
  'depends': ['todo_ui'], 
- 'data': ['views/todo_view.xml'] } 
-
+ 'data': ['views/todo_view.xml'] }
 ```
+
 También agregue un archivo vacío `todo_kanban/__ init__.py`, para que el directorio Python pueda ser importado, como se requiere para los módulos addon de Odoo.
 
 A continuación, crea el archivo XML en el que vaya nuestra nueva vista de kanban brillante y establece kanban como la vista predeterminada en la acción de la ventana de la tarea pendiente. Esto debe ser en `todo_kanban/views/todo_view.xml`, que contiene el siguiente código:
 
+```xml
+<?xml version="1.0"?>
+<odoo>
+    <!-- Add Kanban view mode to the menu Action: -->
+    <act_window id="todo_app.action_todo_task" name="To-Do Tasks"
+                res_model="todo.task" view_mode="kanban,tree,form,calendar,graph,pivot"
+                context="{'search_default_filter_my_tasks': True}"/>
+    <!-- Add Kanban view -->
+    <record id="To-do Task Kanban" model="ir.ui.view">
+        <field name="model">todo.task</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <!-- Empty for now, but the Kanban will go here! -->
+            </kanban>
+        </field>
+    </record>
+</odoo>
 ```
-<?xml version="1.0"?> 
-<odoo> 
-  <!-- Add Kanban view mode to the menu Action: -->   
-  <act_window id="todo_app.action_todo_task" name="To-Do Tasks"                                        
-    res_model="todo.task" view_mode="kanban,tree,form,calendar,graph,pivot"        
-    context="{'search_default_filter_my_tasks': True}" /> 
-  <!-- Add Kanban view --> 
-  <record id="To-do Task Kanban" model="ir.ui.view"> 
-    <field name="model">todo.task</field> 
-    <field name="arch" type="xml"> 
-      <kanban>
-        
-<!-- Empty for now, but the Kanban will go here! -->
 
-
-
- 
-      </kanban> 
-    </field> 
-  </record> 
-</odoo> 
-
-```
 Ahora tenemos el esqueleto básico para nuestro módulo en su lugar.
 
 Antes de comenzar con las vistas kanban, necesitamos agregar un par de campos al modelo de tareas pendientes.
@@ -118,7 +113,7 @@ from . import todo_task
 
 Ahora vamos a editar el archivo `models/todo_task.py`:
 
-```
+```py
 from odoo import models, fields 
 class TodoTask(models.Model): 
     _inherit = 'todo.task' 
@@ -141,39 +136,22 @@ Ahora podemos trabajar en la vista kanban.
 
 La arquitectura de vista kanban tiene un elemento superior `<kanban>` y la siguiente estructura básica:
 
-```
-<kanban default_group_by="stage_id" class="o_kanban_small_column" > 
-  
-<!-- Fields to use in expressions... -->
-
-
-
- 
-  <field name="stage_id" /> 
-  <field name="color" /> 
-  <field name="kanban_state" /> 
-  <field name="priority" /> 
-  <field name="is_done" /> 
-  <field name="message_partner_ids" />
-  
-<!-- (...add other used fields). -->
-
-
-
-
-  <templates>
-    <t t-name="kanban-box">
-      
-<!-- HTML QWeb template... -->
-
-
-
-
-    </t>
-  </templates>
+```xml
+<kanban default_group_by="stage_id" class="o_kanban_small_column">
+    <!-- Fields to use in expressions... -->
+    <field name="stage_id"/>
+    <field name="color"/>
+    <field name="kanban_state"/>
+    <field name="priority"/>
+    <field name="is_done"/>
+    <field name="message_partner_ids"/>
+    <!-- (...add other used fields). -->
+    <templates>
+        <t t-name="kanban-box">
+            <!-- HTML QWeb template... -->
+        </t>
+    </templates>
 </kanban>
-
-
 ```
 
 Observa el atributo `default_group_by="stage_id"` utilizado en el elemento `<kanban>`. Lo usamos para que, por defecto, las tarjetas kanban se agrupen por etapas como deberían los tableros kanban. En los kanbans de listas de tarjetas simples, como el de **Contactos "Contacts"**, no necesitamos esto y en su lugar simplemente usaríamos una sencilla etiqueta de apertura `<kanban>`.
@@ -197,7 +175,6 @@ Odoo utiliza la biblioteca de estilo web de Twitter Bootstrap 3, por lo que esas
 
 Ahora vamos a ver más de cerca las plantillas de QWeb para usarlas en las vistas kanban.
 
-
 ### El diseño de la tarjeta kanban
 
 El área de contenido principal de una tarjeta kanban se define dentro de la plantilla `kanban-box`. Este área de contenido también puede tener un sub-contenedor de pie de página.
@@ -208,57 +185,37 @@ Un botón que abre un menú de acción también puede aparecer en la esquina sup
 
 Aquí está nuestra primera iteración en la plantilla QWeb para nuestra tarjeta kanban:
 
-```
-<!-- Define the kanban-box template --> 
-<t t-name="kanban-box"> 
-  <!-- Set the Kanban Card color: --> 
-  <div t-attf-class="#{kanban_color(record.color.raw_value)} 
-    oe_kanban_global_click"> 
-      <div class="o_dropdown_kanban dropdown"> 
-        
-<!-- Top-right drop down menu here... -->
-
-
-
- 
-      </div> 
-      <div class="oe_kanban_content"> 
-        <div class="oe_kanban_footer"> 
-          <div>
-            
-<!-- Left hand footer... -->
-
-
-
- 
-          </div> 
-          <div> 
-            
-<!-- Right hand footer... -->
-
-
-
- 
-          </div>
-        </div> 
-      </div> <!-- oe_kanban_content --> 
-      <div class="oe_clear"/> 
-  </div> <!-- kanban color --> 
-</t> 
-
+```html
+<!-- Define the kanban-box template -->
+<t t-name="kanban-box">
+    <!-- Set the Kanban Card color: -->
+    <div t-attf-class="#{kanban_color(record.color.raw_value)} 
+    oe_kanban_global_click">
+        <div class="o_dropdown_kanban dropdown">
+            <!-- Top-right drop down menu here... -->
+        </div>
+        <div class="oe_kanban_content">
+            <div class="oe_kanban_footer">
+                <div>
+                    <!-- Left hand footer... -->
+                </div>
+                <div>
+                    <!-- Right hand footer... -->
+                </div>
+            </div>
+        </div> <!-- oe_kanban_content -->
+        <div class="oe_clear"/>
+    </div> <!-- kanban color -->
+</t>
 ```
 
 Esto establece la estructura general de la tarjeta kanban. Puedes notar que el campo `color` se utiliza en el elemento superior `<div>` para establecer dinámicamente el color de la tarjeta. Explicaremos más detalladamente la directiva Qweb `t-attf` en una de las siguientes secciones.
 
 Ahora vamos a trabajar en el área de contenido principal, y elegir qué colocar allí:
 
-```
+```html
 
 <!-- Content elements and fields go here... -->
-
-
-
-
  <div>
    <field name="tag_ids" />
  </div>
@@ -279,14 +236,9 @@ La mayor parte de esta plantilla es HTML normal, pero también vemos el elemento
 
 En el pie de página izquierdo, vamos a insertar el widget de prioridad:
 
-```
-<div> 
-  
+```html
+<div>   
 <!-- Left hand footer... -->
-
-
-
- 
   <field name="priority" widget="priority"/> 
 </div> 
 ```
@@ -294,25 +246,21 @@ Aquí podemos ver el campo `priority` añadido, tal como lo haríamos en una vis
 
 En el pie derecho colocaremos el widget de estado kanban y el avatar para el propietario de la tarea:
 
-```
+```html
 <div> 
-  
-<!-- Right hand footer... -->
-
-
-
- 
+  <!-- Right hand footer... -->
   <field name="kanban_state" widget="kanban_state_selection"/> 
   <img t-att- t-att-src="kanban_image( 
     'res.users', 'image_small', record.user_id.raw_value)" 
     width="24" height="24" class="oe_kanban_avatar pull-right" /> 
 </div> 
 ```
+
 El estado kanban se agrega utilizando un elemento `<field`, al igual que en las vistas de formulario normales. La imagen del avatar del usuario se inserta mediante la etiqueta HTML `<img>`. El contenido de la imagen se genera dinámicamente con la directiva QWeb `t-att-`, que explicaremos en un momento.
 
 A veces queremos tener una pequeña imagen representativa que se mostrará en la tarjeta, como en el ejemplo de **Contactos "Contacts"**. Para hacer referencia, esto se puede hacer agregando lo siguiente como el primer elemento de contenido:
 
-```
+```html
 <img t-att-src="kanban_image( 'res.partner', 'image_medium', 
   record.id.value)" class="o_kanban_image"/> 
 ```
@@ -323,52 +271,38 @@ Las tarjetas Kanban pueden tener un menú de opciones, situado en la parte super
 
 El siguiente es un código HTML de línea de base para el menú de opciones que se agregará en la parte superior del elemento `oe_kanban_content`:
 
+```html
+<div class="o_dropdown_kanban dropdown">
+    <!-- Top-right drop down menu here... -->
+    <a class="dropdown-toggle btn" data-toggle="dropdown" href="#">
+        <span class="fa fa-bars fa-lg"/>
+    </a>
+    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+        <!-- Edit and Delete actions, if available: -->
+        <t t-if="widget.editable">
+            <li>
+                <a type="edit">Edit</a>
+            </li>
+        </t>
+        <t t-if="widget.deletable">
+            <li>
+                <a type="delete">Delete</a>
+            </li>
+        </t>
+        <!-- Call a server-side Model method: -->
+        <t t-if="!record.is_done.value">
+            <li>
+                <a name="do_toggle_done" type="object">Set as Done</a>
+            </li>
+        </t>
+        <!-- Color picker option: -->
+        <li>
+            <ul class="oe_kanban_colorpicker" data-field="color"/>
+        </li>
+    </ul>
+</div>
 ```
-<div class="o_dropdown_kanban dropdown"> 
-  
-<!-- Top-right drop down menu here... -->
 
-
-
- 
-  <a class="dropdown-toggle btn" data-toggle="dropdown" href="#"> 
-    <span class="fa fa-bars fa-lg"/> 
-  </a> 
-  <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel"> 
-    
-<!-- Edit and Delete actions, if available: -->
-
-
-
- 
-    <t t-if="widget.editable"> 
-      <li><a type="edit">Edit</a></li> 
-    </t> 
-    <t t-if="widget.deletable"> 
-      <li><a type="delete">Delete</a></li>
-    </t> 
-    
-<!-- Call a server-side Model method: -->
-
-
-
- 
-    <t t-if="!record.is_done.value"> 
-      <li><a name="do_toggle_done" type="object">Set as Done</a>
-      </li> 
-    </t> 
-    
-<!-- Color picker option: -->
-
-
-
- 
-    <li> 
-      <ul class="oe_kanban_colorpicker" data-field="color"/> 
-    </li> 
-  </ul> 
-</div> 
-```
 Observa que lo anterior no funcionará a menos que tengamos `<field name="is_done" />` en algún lugar de la vista, porque se usa en una de las expresiones. Si no necesitamos usarla dentro de la plantilla, podemos declararla antes del elemento `<templates>`, como lo hicimos al definir la vista `<kanban>`.
 
 El menú desplegable es básicamente una lista HTML de los elementos `<a>`. Algunas opciones, como **Editar "Edit"** y **Eliminar "Delete"**, sólo están disponibles si se cumplen ciertas condiciones. Esto se hace con la directiva QWeb `t-if`. Más adelante en este capítulo, explicamos estas y otras directivas QWeb con más detalle.
@@ -397,14 +331,14 @@ A veces queremos usar una directiva QWeb pero no queremos colocarla en ninguno d
 
 Las directivas QWeb usan frecuentemente expresiones evaluadas para producir resultados diferentes dependiendo de los valores de registro actuales. Existen dos implementaciones QWeb diferentes: JavaScript en el lado del cliente y Python en el lado del servidor.
 
- Los informes y las páginas del sitio web utilizan la implementación Python del lado del servidor. Por otro lado, las vistas kanban utilizan la implementación JavaScript del lado del cliente. Esto significa que la expresión QWeb utilizada en las vistas kanban debe escribirse utilizando la sintaxis JavaScript, no Python.
+Los informes y las páginas del sitio web utilizan la implementación Python del lado del servidor. Por otro lado, las vistas kanban utilizan la implementación JavaScript del lado del cliente. Esto significa que la expresión QWeb utilizada en las vistas kanban debe escribirse utilizando la sintaxis JavaScript, no Python.
 
 Al mostrar una vista de kanban, los pasos internos son aproximadamente como sigue:
 
 1. Obten el XML de las plantillas para procesar.
-1. Llama al método del servidor `read()` para obtener los datos de los campos de las plantillas.
-1. Busca la plantilla `kanban-box` y analizala utilizando QWeb para generar los fragmentos HTML finales.
-1. Inyecta el HTML en la pantalla del navegador (el DOM).
+2. Llama al método del servidor `read()` para obtener los datos de los campos de las plantillas.
+3. Busca la plantilla `kanban-box` y analizala utilizando QWeb para generar los fragmentos HTML finales.
+4. Inyecta el HTML en la pantalla del navegador (el DOM).
 
 Esto no pretende ser técnicamente exacto. Es sólo un mapa mental que puede ser útil para entender cómo funcionan las cosas en las vistas kanban.
 
@@ -462,7 +396,6 @@ Esto resulta en  `class="oe_kanban_text_red"` o en `class="oe_kanban_text_black"
 
 El signo más bajo que `<`, no está permitido en las expresiones, y elegimos trabajar alrededor de esto usando una comparación negada mayor que. Otra posibilidad sería utilizar la función `&lt`; (Menor que) símbolo de escape en su lugar.
 
-
 ### Utilizando t-att para atributos dinámicos
 
 La directiva QWeb `t-att-` genera dinámicamente un valor de atributo mediante la evaluación de una expresión. Nuestra tarjeta kanban lo usa para establecer dinámicamente algunos atributos en la etiqueta `<img>`.
@@ -478,8 +411,8 @@ El campo `.value` devuelve su representación de valores como debería mostrarse
 La etiqueta `src` también se genera dinámicamente, para proporcionar la imagen correspondiente al usuario responsable. Los datos de imagen son proporcionados por la función JavaScript de ayuda, `kanban_image()`:
 
 ```
-t-att-src="kanban_image('res.users', 'image_small', 
-  record.user_id.raw_value)" 
+t-att-src="kanban_image('res.users', 'image_small',
+    record.user_id.raw_value)" 
 ```
 
 Los parámetros de la función son: el modelo para leer la imagen, el nombre del campo a leer y el ID del registro. Aquí usamos `.raw_value`, para obtener el ID de la base de datos del usuario en lugar de su texto de representación.
@@ -589,21 +522,17 @@ Como ejemplo, el siguiente código hace que los plazos perdidos estén en rojo, 
 <li t-att-class="red_or_black"> 
   <field name="date_deadline" /> 
 </li> 
-
 ```
 Las variables también se pueden asignar contenido HTML a una variable, como en el ejemplo siguiente:
 
 ```
 <t t-set="calendar_sign"> 
-  <span class="oe_e">Using t-set to set values on variables
-
-</span> 
-</t> 
-<t t-raw="calendar_sign" /> 
+    <span class="oe_e">Using t-set to set values on variables
+    </span> 
+</t>
 ```
 
 La clase `oe_e` CSS utiliza la fuente de pictograma Entypo. La representación HTML del signo de calendario se almacena en una variable que puede usarse cuando sea necesario en la plantilla. El conjunto de iconos de **Fuente Impresionante "Font Awesome"** también está disponible fuera de la caja, y podría haber sido utilizado.
-
 
 ### Usando t-call para insertar otras plantillas
 
@@ -615,14 +544,14 @@ La lista de avatar del seguidor es algo que podría aislarse en un fragmento reu
 
 
 ```
-<t t-name="follower_avatars"> 
-  <div> 
-    <t t-foreach="record.message_parter_ids.raw_value.slice(0, 3)" 
-      t-as="rec"> 
-      <img t-att-src="kanban_image('res.partner', 'image_small', rec)" 
-        class="oe_avatar" width="24" height="24" /> 
-    </t> 
-  </div> 
+<t t-name="follower_avatars">
+    <div>
+        <t t-foreach="record.message_parter_ids.raw_value.slice(0, 3)"
+           t-as="rec">
+            <img t-att-src="kanban_image('res.partner', 'image_small', rec)"
+                 class="oe_avatar" width="24" height="24"/>
+        </t>
+    </div>
 </t> 
 ```
 
@@ -673,8 +602,6 @@ Utiliza la siguiente asignación:
 
 ```
 <p t-att="{'class': 'oe_bold', 'name': 'test1'}" /> 
-
-
 ```
 
 Esto da como resultado lo siguiente:
@@ -703,22 +630,17 @@ Un caso común es usar los elementos `<field>` como selector, para luego agregar
 
 Para evitar esto, necesitamos usar expresiones XPath para asegurarse de que el campo dentro de la plantilla es el que coincide. Por ejemplo:
 
-```
-<record id="res_partner_kanban_inherit" model="ir.ui.view"> 
-  <field name="name">Contact Kanban modification</field> 
-  <field name="model">res.partner</field> 
-  <field name="inherit_id" ref="base.res_partner_kanban_view" /> 
-  <field name="arch" type="xml"> 
-    
-<xpath expr="//t[@t-name='kanban- box']//field[@name='display_name']"
-
-
-
- 
-      position="before"> 
-      <span>Name:</span> 
-    </xpath> 
-  </field> 
+```xml
+<record id="res_partner_kanban_inherit" model="ir.ui.view">
+    <field name="name">Contact Kanban modification</field>
+    <field name="model">res.partner</field>
+    <field name="inherit_id" ref="base.res_partner_kanban_view"/>
+    <field name="arch" type="xml">
+        <xpath expr="//t[@t-name='kanban- box']//field[@name='display_name']"
+               position="before">
+            <span>Name:</span>
+        </xpath>
+    </field>
 </record> 
 ```
 
@@ -729,16 +651,8 @@ Para estas expresiones XPath más complejas, podemos explorar la sintaxis correc
 Otra opción, que proporciona resultados más agradables, es el comando `xpath` del paquete Debian/Ubuntu `libxml-xpath-perl`:
 
 ```
-
 $ sudo apt-get install libxml-xpath-perl 
-
-
-
-
-
 $ xpath -e "//record[@id='res_partner_kanban_view']" -e "//field[@name='display_name']]" /path/to/*.xml
-
-
 ```
 
 ## Activos personalizados CSS y JavaScript
@@ -764,9 +678,11 @@ A continuación se muestra un archivo XML de ejemplo para agregar un archivo CSS
   </template> 
 </odoo> 
 ```
+
 Como de costumbre, se debe hacer referencia en el archivo descriptor `__manifest__.py`. Observa que los activos se encuentran dentro de un subdirectorio `/static/src`. Aunque esto no es necesario, es una convención generalmente usada.
 
 ## Resúmen
 
 Aprendiste acerca de los tableros kanban y cómo construir las vistas kanban para implementarlas. También introdujimos el modelo QWeb y cómo se puede utilizar para diseñar tarjetas kanban. QWeb es también el motor de renderizado que potencia el sitio web CMS, por lo que está creciendo en importancia en el conjunto de herramientas de Odoo. En el próximo capítulo, seguiremos usando QWeb, pero en el lado del servidor, para crear nuestros informes personalizados.
 
+---
