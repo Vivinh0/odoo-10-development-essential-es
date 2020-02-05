@@ -37,30 +37,15 @@ $ wget http://download.gna.org/wkhtmltopdf/0.12/0.12.1/wkhtmltox-0.12.1_linux-tr
 Luego debemos instalarlo. La instalación de un archivo `deb` local no instala automáticamente las dependencias, por lo que se necesitará un segundo paso para hacerlo y completar la instalación:
 
 ```
-
 $ sudo dpkg -i wkhtml.deb
-
-
-
-
-
 $ sudo apt-get -f install 
-
 ```
 
 Ahora podemos comprobar si la biblioteca `wkhtmltopdf` está correctamente instalada y confirmar que es el número de versión que queremos:
 
-
 ```
-
 $ wkhtmltopdf --version
-
-
-
-
-
 wkhtmltopdf 0.12.1 (with patched qt)
-
 ```
 
 Después de esto, la secuencia de inicio del servidor Odoo no mostrará el mensaje de información **Necesitas un archivo Wkhtmltopdf para imprimir una versión en pdf del reporte "You need Wkhtmltopdf to print a pdf version of the report's"**.
@@ -71,7 +56,7 @@ Por lo general, implementaríamos el informe en nuestro módulo de complemento d
 
 Nuestro informe se verá así:
 
-![Report](file:img/10-01.jpg)
+![Report](.img/10-01.jpg)
 
 Nombraremos este nuevo módulo addon `todo_report`. Lo primero que debe hacer es crear un archivo `__init__.py` vacío y el archivo de manifiesto `__manifest__.py`: 
 
@@ -87,7 +72,7 @@ Nombraremos este nuevo módulo addon `todo_report`. Lo primero que debe hacer es
 
 El archivo `reports/todo_report.xml` puede comenzar declarando el nuevo informe de la siguiente manera: 
 
-```
+```xml
 <?xml version="1.0"?> 
 <odoo> 
   <report id="action_todo_task_report" 
@@ -97,7 +82,6 @@ El archivo `reports/todo_report.xml` puede comenzar declarando el nuevo informe 
     name="todo_report.report_todo_task_template" 
   /> 
 </odoo> 
-
 ```
 
 La etiqueta `<report>` es un acceso directo para escribir datos al modelo `ir.actions.report.xml`, que es un tipo particular de acción del cliente. Sus datos están disponibles en las opciones de menú **Configuración | Técnico | Informes " Settings | Technical | Reports "**.
@@ -139,7 +123,7 @@ Para empezar, las expresiones QWeb se evalúan utilizando la sintaxis de Python,
 La forma en que se evalúan las expresiones también es diferente. Para los informes, tenemos disponibles las siguientes variables:
 
 + `docs` es una colección iterable con los registros a imprimir
-+ `doc_ids es una lista de los IDs de los registros a imprimir
++ `doc_ids` es una lista de los IDs de los registros a imprimir
 + `doc_model` identifica el modelo de los registros, `todo.task` por ejemplo
 + `time is` es una referencia a la biblioteca de tiempo de Python
 + `user` es el registro para el usuario que ejecuta el informe
@@ -164,15 +148,9 @@ Ahora podemos empezar a diseñar el contenido de la página de nuestro informe:
  
 <t t-foreach="docs" t-as="o"> 
   <div class="row"> 
-
     <!-- Data Row Content --> 
-
-
-
-
   </div> 
-</t> 
-
+</t>
 ```
 
 El diseño del contenido puede utilizar el sistema de cuadrícula HTML de Bootstrap de Twitter. En pocas palabras, Bootstrap tiene un diseño de cuadrícula con 12 columnas. Se puede añadir una nueva fila usando `<div class="row">`. Dentro de una fila, tenemos celdas, cada una de ellas abarcando un cierto número de columnas, que debe ocupar las 12 columnas. Cada celda se puede definir con la fila `<div class="col-xs-N">`, donde N es el número de columnas que abarca.
@@ -187,7 +165,7 @@ Dado que la renderización se realiza en el lado del servidor, los registros son
 
 Este es el XML para el contenido de las filas de registros:
 
-```
+```html
 <div class="col-xs-3"> 
   <h4><span t-field="o.name" /></h4> 
 </div> 
@@ -239,6 +217,7 @@ La última columna de nuestro informe contará con la lista de seguidores, con l
   </t> 
 </ul> 
 ```
+
 El contenido de los campos binarios se proporciona en una representación `base64`. El elemento `<img>` puede aceptar directamente este tipo de datos para el atributo `src`. Así podemos utilizar la directiva Qweb `t-att-src` para generar dinámicamente cada una de las imágenes.
 
 ## Total de resumen y totales corrientes
@@ -272,6 +251,7 @@ Para ilustrar esto, podemos calcular el número acumulado de seguidores. Debemos
 ```
 <t t-set="follower_count" t-value="0" /> 
 ```
+
 Y luego, dentro del bucle, añade el número de seguidores del registro a la variable. Elegiremos hacerlo justo después de presentar la lista de seguidores, e imprimiremos también el total actual en cada línea:
 
 ```
@@ -279,10 +259,10 @@ Y luego, dentro del bucle, añade el número de seguidores del registro a la var
   <t t-set="follower_count" 
     t-value="follower_count + len(o.message_follower_ids)" /> 
   Accumulated # <t t-esc="follower_count" /> 
-
 ```
 
 ## Definiendo formatos de papel
+
 En este punto nuestro informe se ve bien en HTML, pero no se imprime bien en una página PDF. Podríamos obtener mejores resultados usando una página horizontal. Así que tenemos que añadir este formato de papel.
 
 En la parte superior del archivo XML, agregua este registro:
@@ -321,6 +301,7 @@ Vamos a editar la acción utilizada para abrir nuestro informe, para agregar est
   paperformat="paperformat_euro_landscape" 
 /> 
 ```
+
 #### Tip
 
 El atributo `paperformat` en la etiqueta `<report>` se agregó en la versión 9.0. Para 8.0 necesitamos usar un elemento `<record>` para agregar una acción de informe con un valor `paperformat`.
@@ -350,7 +331,6 @@ La función espera un nombre de plantilla, y lo procesará y traducirá. Esto si
     </t> 
   </t> 
 </template> 
-
 ```
 
 ## Informes basados ​​en SQL personalizado
@@ -378,10 +358,7 @@ class TodoReport(models.Model):
     is_done = fields.Boolean('Done?') 
     active = fields.Boolean('Active?') 
     user_id = fields.Many2one('res.users', 'Responsible') 
-    date_deadline = fields.Date('Deadline') 
- 
-    
-
+    date_deadline = fields.Date('Deadline')
 ```
 
 Para que este archivo se cargue necesitamos agregar una línea `from . import reports` a la parte superior del archivo `__init__.py` y `from . import todo_task_report` al archivo `reports/__init__.py`.
@@ -445,3 +422,5 @@ Para casos aún más complejos, podemos utilizar una solución diferente: un asi
 En el capítulo anterior aprendimos sobre QWeb y cómo usarlo para diseñar una vista Kanban. En este capítulo aprendimos sobre el motor de informes QWeb y sobre las técnicas más importantes para generar informes con el lenguaje de plantillas QWeb.
 
 En el próximo capítulo, seguiremos trabajando con QWeb, esta vez para construir páginas web. También aprenderemos a escribir controladores web, proporcionando funciones más completas a nuestras páginas web.
+
+---
