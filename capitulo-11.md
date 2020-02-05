@@ -25,7 +25,8 @@ Como de costumbre, comenzaremos a crear su archivo de manifiesto. Crea el archiv
   'name': 'To-Do Website', 
   'description': 'To-Do Tasks Website', 
   'author': 'Daniel Reis', 
-  'depends': ['todo_kanban']}
+  'depends': ['todo_kanban']
+}
 ```
 Estamos construyendo sobre el módulo todo_kanban, de modo que tengamos todas las características disponibles añadidas al modelo de Tareas pendientes a lo largo del libro.
 
@@ -140,7 +141,6 @@ Dentro del método `hello()` ejecutamos el método heredado para obtener su resp
 
 ```
 return request.render('todo_website.hello')  
-
 ```
 
 Esto genera un objeto `http.Response`, pero la representación real se retrasa hasta el final del despacho.
@@ -160,8 +160,7 @@ Ahora necesitamos modificar la plantilla `QWeb`, Para que haga uso de esta infor
 <odoo> 
   <template id="hello_extended"  
     name="Extended Hello World" 
-    
-inherit_id="todo_website.hello"> 
+        inherit_id="todo_website.hello"> 
     <xpath expr="//h1" position="replace"> 
       <h1> 
         Hello <t t-esc="name or 'Someone'" />! 
@@ -176,9 +175,8 @@ No debemos olvidar declarar este archivo de datos adicional en nuestro manifiest
 
 ```
 'data': [
-   'Views/todo_web.xml',
-  
-'views/todo_extend.xml'
+    'Views/todo_web.xml',
+    'views/todo_extend.xml'
 ],
 ```
 Después de esto, accediendo a `http://localhost:8069/hello?name=John debe mostrarnos un mensaje **Hello John!**.
@@ -229,8 +227,9 @@ Las páginas dadas por los ejemplos anteriores no están integradas con el módu
 Para usarlo, debemos comenzar instalando el módulo `website` en nuestra instancia de trabajo y luego agregarlo como una dependencia a nuestro módulo. La clave `depends` en __manifest__.py debe tener el siguiente aspecto:
 
 ```
-'depends': ['todo_kanban', 
-'website'
+'depends': [
+    'todo_kanban', 
+    'website'
 ], 
 ```
 
@@ -271,17 +270,12 @@ Luego tenemos que incluirlo en las páginas del sitio web. Esto se hace agregán
 ```
 <Odoo>
   <Template id = "assets_frontend"
-    Name = "todo_website_assets"
-   
- Inherit_id = "website.assets_frontend">
+    Name = "todo_website_assets" 
+        Inherit_id = "website.assets_frontend">
     <Xpath expr = "." Position = "inside">
       <Link rel = "stylesheet" type = "text / css"
         Href = "/ todo_website / static / src / css / index.css" />
     </ Xpath>
-
-
-
- 
   </ Template>
 </ Odoo>
 ```
@@ -297,8 +291,8 @@ Para ello, necesitamos un método controlador, la preparación de los datos a pr
 Edita el archivo `todo_website/controllers/main.py` para agregar este método:
 
 ```
-#class Main(http.Controller): 
-   
+#class Main(http.Controller):
+
     @http.route('/todo', auth='user' , website=True) 
     def index(self, **kwargs): 
         TodoTask = request.env['todo.task'] 
@@ -409,11 +403,9 @@ Mirando hacia atrás en el botón Agregar en la lista Tarea por hacer, podemos v
 Debemos comenzar agregando la dependencia `website_form` a nuestro módulo. Podemos reemplazar el módulo `website`, ya que mantenerlo explícitamente sería redundante. En el `todo_website/__ manifest__.py` edite la  clave `depends` a:
 
 ```
-'Depende': ['todo_kanban',
-'Website_form'
-
-
-
+'Depende': [
+    'todo_kanban',
+    'Website_form'
 ],
 ```
 Ahora vamos a añadir la página con el formulario.
@@ -558,7 +550,6 @@ Dado que este manejo genérico de formularios está bastante abierto y se basa e
 
 Para añadir campos a esta lista blanca, se proporciona una función de ayuda y podemos usarla desde un archivo de datos XML. Debemos crear el archivo `todo_website/data/config_data.xml` con:
 
-
 ```
 <?xml version="1.0" encoding="utf-8"?> 
 <odoo> 
@@ -623,7 +614,6 @@ class TodoTask(models.Model):
         return values 
 ```
 
-
 El método `website_form_input_filter` realmente espera dos parámetros: el objeto `request` y el diccionario `values`. Los errores que impiden el envío de formularios deben generar una excepción `ValidationError`.
 
 La mayor parte del tiempo este punto de extensión para los formularios debería permitirnos evitar manipuladores de presentación de formularios personalizados.
@@ -635,3 +625,5 @@ Como de costumbre, debemos importar este nuevo achivo de Python, añadiendo `fro
 Ahora debes tener un buen entendimiento sobre lo esencial de las características del sitio web. Hemos visto cómo usar controladores web y plantillas QWeb para renderizar páginas web dinámicas. A continuación, aprendimos a utilizar el complemento de sitio web y crear nuestras propias páginas para ello. Por último, hemos introducido el complemento de formularios de sitios web que nos ayudó a crear un formulario web. Estos deben proporcionarnos las habilidades básicas necesarias para crear las características del sitio web.
 
 A continuación, aprenderemos cómo tener aplicaciones externas interactuar con nuestras aplicaciones Odoo.
+
+---
