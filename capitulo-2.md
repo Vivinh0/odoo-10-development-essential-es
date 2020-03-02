@@ -357,6 +357,7 @@ Odoo es lo suficientemente agradable como para generarlos automáticamente para 
 Si una actualización falla debido a un error de XML, no te preocupe! Comenta las últimas porciones XML editadas o elimina el archivo XML de `__manifest__.py` y repita la actualización. El servidor debe iniciarse correctamente. Ahora lee el mensaje de error en el registro del servidor con cuidado: debe señalarte dónde está el problema.
 
 Odoo admite varios tipos de vistas, pero las tres más importantes son: `tree` (generalmente llamado vistas de lista), `form` y `search views`. Vamos a añadir un ejemplo de cada uno a nuestro módulo.
+
 ### Creando la vista de formulario
 
 Todas las vistas se almacenan en la base de datos, en el modelo `ir.ui.view`. Para añadir una vista a un módulo, declaramos un elemento `<record>` que describe la vista en un archivo XML, que se va a cargar en la base de datos cuando se instala el módulo.
